@@ -4,39 +4,129 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Galería</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Playfair+Display:wght@400;500&family=Lora:wght@400;500&family=Montserrat:wght@300;400;500&family=DM+Serif+Display&family=Josefin+Sans:wght@300;400&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#faf9f5;--fg:#1f1e1d;--mu:#6b6a65;--bd:#dedbd2;--card:#fff;--ac:#D85A30}
-[data-theme=dark]{--bg:#171716;--fg:#f1efe8;--mu:#a8a69e;--bd:#3a3935;--card:#222221}
+:root{--bg:#fff;--s:#f5f4f1;--fg:#161616;--mu:#78766f;--bd:#e7e5e0;--er:#b3392f}
+[data-theme=dark]{--bg:#121211;--s:#1b1b1a;--fg:#f1efe9;--mu:#9a9890;--bd:#2c2c2a}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,sans-serif;font-size:16px}
-#app{max-width:720px;margin:0 auto;padding:14px}
-h2,h3{font-weight:500;margin:0 0 10px}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 button,input,select{font:inherit;color:inherit}
-button,label.btn{background:transparent;border:1px solid var(--bd);border-radius:8px;padding:8px 12px;cursor:pointer;display:inline-block}
-button.pri{background:var(--fg);color:var(--bg);border-color:var(--fg)}
-button.dng{color:#c0392b}
-input,select{background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:9px 10px;width:100%}
-input[type=checkbox]{width:auto}
-input[type=range]{padding:0}
-input[type=color]{height:40px;padding:2px}
+h1,h2,h3{font-weight:500;margin:0;letter-spacing:-.01em}
+.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 16px;padding:12px 18px;border-bottom:1px solid var(--bd);position:sticky;top:0;background:var(--bg);z-index:4}
+.brand{font-weight:500;font-size:17px}
+.top nav{display:flex;gap:4px;order:3;width:100%}
+@media(min-width:720px){.top nav{order:0;width:auto}}
+.top nav button{border:0;background:transparent;padding:6px 14px;border-radius:999px;color:var(--mu);cursor:pointer}
+.top nav button.on{background:var(--s);color:var(--fg)}
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
-.tabs button.on{border-color:var(--ac);color:var(--ac)}
-.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;margin-bottom:10px}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--bd);background:transparent;border-radius:999px;padding:9px 18px;cursor:pointer;text-decoration:none;color:var(--fg);font-size:14px;white-space:nowrap}
+.btn:hover{border-color:var(--fg)}
+.btn.pri{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.btn.dng{color:var(--er)}
+.ib{border:0;background:transparent;cursor:pointer;padding:6px 10px;border-radius:8px;display:inline-flex;align-items:center;color:var(--fg)}
+.wrap{max-width:1100px;margin:0 auto;padding:22px 18px 60px}
+input,select{background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;width:100%;outline:none}
+input:focus,select:focus{border-color:var(--fg)}
+input[type=checkbox]{width:auto}
+input[type=range]{padding:0;accent-color:var(--fg)}
+input[type=color]{height:42px;padding:3px}
+.fld{margin-bottom:14px;font-size:13px;color:var(--mu)}
+.fld>input,.fld>select{margin-top:6px;font-size:15px;color:var(--fg)}
 .mu{color:var(--mu);font-size:13px}
-.err{color:#c0392b;font-size:14px;min-height:20px}
-.fld{margin-bottom:10px;font-size:13px;color:var(--mu)}
-.fld>input,.fld>select{margin-top:4px;color:var(--fg);font-size:16px}
-.img{position:relative;overflow:hidden;border-radius:6px;background:#888;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none}
-.img img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;-webkit-user-drag:none}
-.shield{position:absolute;inset:0}
-.x{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.6);color:#fff;border:none;padding:2px 9px}
-.item{display:flex;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--bd)}
-.item img{width:44px;height:44px;object-fit:cover;border-radius:6px}
-.dot{width:44px;height:44px;border-radius:6px;background:var(--bd);display:flex;align-items:center;justify-content:center}
-#toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:14px;display:none;z-index:9}
-canvas{width:100%;border-radius:8px;display:block}
+.err{color:var(--er);font-size:14px;min-height:22px}
+.card{border:1px solid var(--bd);border-radius:16px;padding:18px;margin-bottom:14px}
+.login{max-width:380px;margin:12vh auto 0;padding:0 18px}
+.login h1{font-size:30px;margin-bottom:6px}
+.tabs{display:flex;gap:24px;border-bottom:1px solid var(--bd);overflow-x:auto;margin:18px 0 20px}
+.tabs button{border:0;background:transparent;padding:10px 0;color:var(--mu);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap}
+.tabs button.on{color:var(--fg);border-color:var(--fg)}
+.cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media(min-width:720px){.cols{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.col{cursor:pointer}
+.col .cv{aspect-ratio:4/3;border-radius:12px;overflow:hidden;background:var(--s);display:flex;align-items:center;justify-content:center;color:var(--mu);font-size:13px}
+.col .cv img{width:100%;height:100%;object-fit:cover}
+.col b{display:block;font-weight:500;margin-top:8px}
+.ah{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:14px}
+.ah h1{font-size:28px}
+.back{border:0;background:transparent;color:var(--mu);cursor:pointer;padding:0 0 10px;font-size:14px}
+.drop{display:block;border:1.5px dashed var(--bd);border-radius:16px;padding:26px 16px;text-align:center;cursor:pointer}
+.drop:hover{border-color:var(--fg)}
+.bar{height:3px;background:var(--bd);border-radius:2px;overflow:hidden;margin:12px 0 16px}
+.bar i{display:block;height:100%;width:0;background:var(--fg);transition:width .3s}
+.pg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media(min-width:720px){.pg{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.pt{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;background:var(--s)}
+.pt img{width:100%;height:100%;object-fit:contain;display:block}
+.pb{position:absolute;top:6px;width:30px;height:30px;border-radius:50%;border:0;background:rgba(0,0,0,.55);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.tag{position:absolute;left:6px;bottom:6px;background:rgba(0,0,0,.6);color:#fff;font-size:12px;padding:2px 9px;border-radius:999px}
+.item{display:flex;gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--bd)}
+.item img{width:48px;height:48px;object-fit:cover;border-radius:8px;flex:none}
+.av{width:48px;height:48px;border-radius:50%;background:var(--s);display:flex;align-items:center;justify-content:center;font-weight:500;flex:none}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.chip{border:1px solid var(--bd);border-radius:999px;padding:6px 14px;font-size:13px;background:transparent;cursor:pointer}
+.chip.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.stat{background:var(--s);border-radius:14px;padding:14px}
+.stat div:last-child{font-size:26px;font-weight:500}
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.pvf{border:1px solid var(--bd);border-radius:16px;overflow:hidden;max-height:560px;overflow-y:auto;margin-bottom:16px}
+canvas{width:100%;border-radius:12px;display:block}
+#toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:9px 16px;border-radius:999px;font-size:14px;display:none;z-index:99}
+
+/* ---- Galería del cliente ---- */
+.g{background:var(--gbg);color:var(--gfg);font-family:var(--gfont),serif;min-height:100svh}
+.g-hero{position:relative;height:var(--hh);overflow:hidden;color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px}
+.g-hero>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;-webkit-touch-callout:none;animation:gz 1.6s ease-out both}
+@keyframes gz{from{opacity:0;transform:scale(1.04)}to{opacity:1;transform:none}}
+.g-hero:after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(0,0,0,.22),rgba(0,0,0,.52))}
+.g-hero>div{position:relative;z-index:1;max-width:780px}
+.g-plain{text-align:center;padding:64px 24px 40px}
+.g-t{font-size:clamp(32px,8.5vw,72px);line-height:1.06;margin:0 0 16px;font-weight:400;letter-spacing:.005em}
+.g-line{width:44px;height:2px;background:var(--gac);margin:0 auto 18px}
+.g-sub{font-size:clamp(15px,2.8vw,19px);margin:0 0 28px;opacity:.9;font-style:italic}
+.g-plain .g-sub{margin:0;color:var(--gmu)}
+.g-btn{border:1px solid #fff;color:#fff;background:transparent;padding:12px 30px;letter-spacing:.12em;font-size:13px;cursor:pointer;font-family:inherit;text-transform:uppercase}
+.g-btn:hover{background:#fff;color:#111}
+.g-nav{position:sticky;top:0;z-index:5;background:var(--gbg);border-bottom:1px solid var(--gbd);display:flex;align-items:center;justify-content:space-between;padding:10px 16px;gap:10px}
+.g-nav b{font-weight:400;font-size:17px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.g-nav>div{display:flex;gap:2px;flex:none}
+.g-ib{background:transparent;border:0;color:var(--gfg);cursor:pointer;display:inline-flex;align-items:center;gap:7px;padding:7px 10px;font-family:inherit;font-size:14px;border-radius:999px}
+.g-ib.act{color:var(--gac)}
+.g-body{padding:12px;max-width:1400px;margin:0 auto}
+.g-empty{text-align:center;color:var(--gmu);padding:60px 20px;margin:0}
+.g-grid{--rh:190px;display:flex;flex-wrap:wrap;gap:8px}
+.g-grid::after{content:"";flex-grow:9999}
+.g-grid .g-i{flex:calc(var(--ar)*100) 1 calc(var(--ar)*var(--rh));min-width:0;margin:0}
+.g-mas{column-count:2;column-gap:8px}
+.g-big{max-width:900px;margin:0 auto;display:grid;gap:12px}
+@media(min-width:720px){.g-body{padding:20px}.g-grid{--rh:250px;gap:12px}.g-mas{column-count:3;column-gap:12px}}
+@media(min-width:1100px){.g-grid{--rh:290px}.g-mas{column-count:4}}
+.g-i{position:relative;overflow:hidden;background:var(--gbd);cursor:pointer;break-inside:avoid;margin-bottom:8px;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none;aspect-ratio:var(--ar,1.5)}
+.g-big .g-i{margin:0}
+.g-i img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;-webkit-user-drag:none;opacity:0;transition:opacity .6s,transform .7s}
+.g-i img.ok{opacity:1}
+@media(hover:hover){.g-i:hover img{transform:scale(1.03)}}
+.g-h{position:absolute;right:8px;bottom:8px;width:38px;height:38px;border-radius:50%;border:0;background:rgba(0,0,0,.4);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.g-h.on{color:var(--gac);background:rgba(255,255,255,.94)}
+.gate{min-height:100svh;display:flex;align-items:center;justify-content:center;position:relative;padding:20px;font-family:var(--gfont),serif;background:var(--gbg)}
+.gate-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(14px) brightness(.7);transform:scale(1.08);pointer-events:none}
+.gate-card{position:relative;background:var(--gbg);color:var(--gfg);width:100%;max-width:400px;padding:34px 28px;text-align:center}
+.gate-card input{background:transparent;color:var(--gfg);border:1px solid var(--gbd);border-radius:0;margin-bottom:10px;text-align:center;padding:13px 12px;font-family:inherit}
+.gate-card input:focus{border-color:var(--gac)}
+.g-solid{width:100%;border:0;background:var(--gac);color:#fff;padding:14px;letter-spacing:.1em;font-size:13px;text-transform:uppercase;cursor:pointer;font-family:inherit}
+.lb{position:fixed;inset:0;background:rgba(8,8,8,.97);z-index:60;display:flex;flex-direction:column;color:#fff;font-family:var(--gfont),serif}
+.lb-top{display:flex;justify-content:space-between;align-items:center;padding:10px 12px}
+.lb-b{background:transparent;border:0;color:#fff;cursor:pointer;padding:8px 10px;display:inline-flex}
+.lb-stage{flex:1;min-height:0;position:relative;display:flex;align-items:center;justify-content:center}
+.lb-stage img{max-width:100%;max-height:100%;object-fit:contain;pointer-events:none;-webkit-touch-callout:none;user-select:none}
+.lb-n{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.35);border:0;color:#fff;width:44px;height:44px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.lb-p{left:10px}.lb-nx{right:10px}
+.lb-bot{display:flex;gap:8px;padding:12px}
+.lb-bot input{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:999px;padding:11px 16px}
+.lb-s{border:0;background:#fff;color:#111;border-radius:999px;padding:0 20px;cursor:pointer;font-family:inherit}
+@media(prefers-reduced-motion:reduce){.g-hero>img{animation:none}.g-i img{transition:none}}
 </style>
 </head>
 <body>
@@ -53,13 +143,26 @@ const app=$('#app');
 const configured=!SUPABASE_URL.startsWith('PEGA');
 const sb=configured?supabase.createClient(SUPABASE_URL,SUPABASE_KEY):null;
 const pub=p=>sb.storage.from('gallery').getPublicUrl(p).data.publicUrl;
-const FONTS=[['Georgia, serif','Georgia'],["'Palatino Linotype', serif",'Palatino'],["'Trebuchet MS', sans-serif",'Trebuchet'],['system-ui, sans-serif','Moderna'],["'Courier New', monospace",'Máquina de escribir']];
+const FONTS=[["'Cormorant Garamond', serif",'Cormorant Garamond'],["'Playfair Display', serif",'Playfair Display'],["'Lora', serif",'Lora'],["'DM Serif Display', serif",'DM Serif Display'],["'Montserrat', sans-serif",'Montserrat'],["'Josefin Sans', sans-serif",'Josefin Sans'],["'Inter', sans-serif",'Inter'],['Georgia, serif','Georgia']];
+const PRESETS=[
+ ['Elegante',{font:FONTS[1][0],accent:'#A88B5A',layout:'mas',dark:false,cover:true}],
+ ['Moderno',{font:FONTS[4][0],accent:'#2F5D50',layout:'grid',dark:false,cover:true}],
+ ['Nocturno',{font:FONTS[0][0],accent:'#D4AF7A',layout:'mas',dark:true,cover:true}],
+ ['Editorial',{font:FONTS[2][0],accent:'#7A4B3A',layout:'big',dark:false,cover:true}]];
 const SLUG=new URLSearchParams(location.search).get('g');
 let timer=null;
 document.documentElement.dataset.theme=localStorage.getItem('theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
-function toggleTheme(){const t=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=t;localStorage.setItem('theme',t)}
-function toast(m){const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(t._t);t._t=setTimeout(()=>t.style.display='none',2500)}
+function toggleTheme(){const t=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=t;localStorage.setItem('theme',t);if(S.a)viewAlbum();else if(S.user)home()}
+function toast(m){const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(t._t);t._t=setTimeout(()=>t.style.display='none',2600)}
 const when=s=>new Date(s).toLocaleString('es',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+const ic=(d,f)=>`<svg viewBox="0 0 24 24" width="20" height="20" fill="${f||'none'}" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const HEART='<path d="M12 20s-7-4.5-9.3-9A5 5 0 0 1 12 6.5 5 5 0 0 1 21.3 11C19 15.5 12 20 12 20z"/>';
+const heart=on=>ic(HEART,on?'currentColor':'none');
+const MOON='<path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/>';
+const SUN='<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>';
+const XI='<path d="M6 6l12 12M18 6L6 18"/>';
+const STAR='<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>';
+const LEFT='<path d="M15 5l-7 7 7 7"/>',RIGHT='<path d="M9 5l7 7-7 7"/>';
 
 /* ---------- Imagen: lectura (incluye vista previa incrustada de RAW), marca de agua y reducción ---------- */
 async function decode(file){
@@ -92,60 +195,85 @@ async function bake(file,w){
   const W=Math.round(bm.width*sc),H=Math.round(bm.height*sc);
   const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
   x.drawImage(bm,0,0,W,H);await mark(x,W,H,w);
-  return new Promise(r=>c.toBlob(r,'image/jpeg',.82));
+  const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',.82));
+  return {blob,W,H};
 }
 
-/* ---------- Vista de galería (la usa el cliente y la previsualización de diseño) ---------- */
-const col=al=>al.dark?{bg:'#171716',fg:'#f1efe8',mu:'#a8a69e',bd:'#3a3935'}:{bg:'#faf9f5',fg:'#1f1e1d',mu:'#6b6a65',bd:'#dedbd2'};
+/* ---------- Orientación: vertical u horizontal ---------- */
+function ratioOf(path){const m=/_(\d+)x(\d+)\.jpg$/.exec(path||'');return m?+(m[1]/m[2]).toFixed(4):null}
+const mapPhoto=p=>Object.assign({},p,{url:pub(p.path),ar:ratioOf(p.path)});
+function orient(i){
+  i.classList.add('ok');const t=i.closest('.g-i');
+  if(t&&i.naturalWidth&&i.naturalHeight){
+    const r=+(i.naturalWidth/i.naturalHeight).toFixed(4);
+    if(Math.abs(r-parseFloat(t.style.getPropertyValue('--ar')||0))>0.02)t.style.setProperty('--ar',r);
+  }
+}
+
+/* ---------- Vista de galería (cliente y previsualización de diseño) ---------- */
+const col=al=>al.dark?{bg:'#0f0f0f',fg:'#f2f0ea',mu:'#9a9890',bd:'#2a2a28'}:{bg:'#ffffff',fg:'#1a1a1a',mu:'#77756f',bd:'#e8e6e1'};
+const gvars=al=>{const k=col(al);return `--gbg:${k.bg};--gfg:${k.fg};--gmu:${k.mu};--gbd:${k.bd};--gac:${al.accent};--gfont:${al.font}`};
 function renderGallery(el,al,photos,o){
-  const k=col(al),lay=al.layout,AR=[1.5,.8,1,1.5,.8,1.2];
-  if(o.live)document.body.style.background=k.bg;
-  const gs=lay==='grid'?'display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px':lay==='mas'?'column-count:2;column-gap:8px':'display:grid;grid-template-columns:minmax(0,1fr);gap:10px';
-  const ar=i=>lay==='grid'?1.1:lay==='big'?1.5:AR[i%6];
-  const ib=`background:transparent;color:${k.mu};border:1px solid ${k.bd}`;
-  const cells=photos.map((p,i)=>{
-    const liked=o.liked&&o.liked.has(p.id);
-    return `<div style="${lay==='mas'?'break-inside:avoid;margin-bottom:8px':''}"><div class="img" style="aspect-ratio:${ar(i)}"><img src="${p.url}" draggable="false" alt=""><div class="shield"></div></div>
-    <div style="display:flex;gap:6px;margin-top:4px;align-items:center"><button data-like="${p.id}" style="padding:4px 10px;background:transparent;color:${liked?al.accent:k.mu};border:1px solid ${liked?al.accent:k.bd}">${liked?'♥ Elegida':'♡'}</button>
-    ${o.live?`<input data-ci="${p.id}" value="${esc((o.comments||{})[p.id]||'')}" placeholder="Sugerencia" style="flex:1;min-width:0;padding:5px 8px;font-size:14px;background:transparent;color:${k.fg};border:1px solid ${k.bd}"><button data-cs="${p.id}" style="padding:4px 10px;${ib}">Enviar</button>`:''}</div></div>`}).join('');
-  el.innerHTML=`<div style="background:${k.bg};color:${k.fg};font-family:${al.font};border-radius:12px;padding:14px;border:1px solid ${k.bd}">
-  ${al.cover&&photos[0]?`<div class="img" style="aspect-ratio:1.9;margin-bottom:12px"><img src="${photos[0].url}" draggable="false" alt=""><div class="shield"></div></div>`:''}
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div><div style="font-size:22px">${esc(al.title)}</div><div style="width:36px;height:3px;background:${al.accent};margin:6px 0"></div></div>
-  <button data-dark="1" style="${ib};padding:4px 10px">${al.dark?'Claro':'Oscuro'}</button></div>
-  <p style="margin:0 0 12px;font-size:14px;color:${k.mu}">Hola, ${esc(o.name)}. ${esc(al.subtitle)}</p>
-  ${photos.length?`<div style="${gs}">${cells}</div>`:`<p style="font-size:14px;color:${k.mu}">Este álbum aún no tiene fotos.</p>`}</div>`;
+  const pv=!o.live,list=o.onlyFav?photos.filter(p=>o.liked.has(p.id)):photos,lay=al.layout;
+  if(o.live)document.body.style.background=col(al).bg;
+  const cls=lay==='mas'?'g-mas':lay==='big'?'g-big':'g-grid';
+  const tiles=list.map(p=>{const on=o.liked.has(p.id);return `<div class="g-i" data-o="${p.id}" style="--ar:${p.ar||1.5}"><img src="${p.url}" alt="" draggable="false" loading="lazy" onload="orient(this)">${pv?'':`<button class="g-h ${on?'on':''}" data-h="${p.id}" aria-label="Favorita">${heart(on)}</button>`}</div>`}).join('');
+  const first=photos[0];
+  const head=`<h1 class="g-t">${esc(al.title)}</h1><div class="g-line"></div><p class="g-sub">${esc(al.subtitle)}</p>`;
+  const hero=al.cover&&first?`<header class="g-hero" style="--hh:${pv?'280px':'100svh'}"><img src="${first.url}" alt="" draggable="false"><div>${head}${pv?'':'<button class="g-btn" data-act="scroll">Ver fotos</button>'}</div></header>`:`<header class="g-plain">${head}</header>`;
+  const nav=`<nav class="g-nav"><b>${esc(al.title)}</b><div><button class="g-ib ${o.onlyFav?'act':''}" data-act="fav">${heart(o.onlyFav)}<span>Favoritas <span data-cnt>${o.liked.size}</span></span></button><button class="g-ib" data-act="dark" aria-label="Cambiar modo">${ic(al.dark?SUN:MOON)}</button></div></nav>`;
+  const body=list.length?`<div class="g-body" id="gb"><div class="${cls}">${tiles}</div></div>`:`<div class="g-body" id="gb"><p class="g-empty">${o.onlyFav?'Aún no has marcado favoritas. Toca el corazón en las fotos que más te gusten.':'Este álbum todavía no tiene fotos.'}</p></div>`;
+  el.innerHTML=`<div class="g" style="${gvars(al)}">${hero}${nav}${body}</div>`;
+  el.querySelectorAll('.g-i img').forEach(i=>{if(i.complete&&i.naturalWidth)orient(i)});
   el.oncontextmenu=e=>{if(o.live)e.preventDefault()};
   el.onclick=e=>{
     if(!o.live)return;
-    const t=e.target.closest('[data-like],[data-cs],[data-dark]');if(!t)return;
-    if(t.dataset.like)o.like(t.dataset.like);
-    else if(t.dataset.cs){const inp=el.querySelector('[data-ci="'+t.dataset.cs+'"]');o.cmt(t.dataset.cs,inp.value.trim())}
-    else o.dark();
+    const h=e.target.closest('[data-h]');if(h){e.stopPropagation();o.toggle(h.dataset.h);return}
+    const op=e.target.closest('[data-o]');if(op){o.open(op.dataset.o);return}
+    const a=e.target.closest('[data-act]');if(!a)return;
+    if(a.dataset.act==='fav')o.fav();else if(a.dataset.act==='dark')o.dark();else $('#gb').scrollIntoView({behavior:'smooth'});
   };
 }
 
 /* ---------- Modo cliente (enlace ?g=...) ---------- */
 async function clientMode(slug){
   const {data,error}=await sb.rpc('get_gallery',{p_slug:slug});
-  if(error||!data){app.innerHTML='<p style="padding:20px">Esta galería no existe o el enlace cambió.</p>';return}
-  const al=Object.assign({},data.album),photos=(data.photos||[]).map(p=>Object.assign({},p,{url:pub(p.path)}));
+  if(error||!data){app.innerHTML='<p style="padding:30px;text-align:center">Esta galería no existe o el enlace cambió.</p>';return}
+  const al=Object.assign({},data.album),photos=(data.photos||[]).map(mapPhoto);
   const ls=k=>{try{return JSON.parse(localStorage.getItem(k+slug))}catch(e){return null}};
-  let V=ls('v_');const L=new Set(ls('l_')||[]);const C=ls('c_')||{};
+  let V=ls('v_'),onlyFav=false;const L=new Set(ls('l_')||[]),C=ls('c_')||{};
   const sv=()=>{localStorage.setItem('l_'+slug,JSON.stringify([...L]));localStorage.setItem('c_'+slug,JSON.stringify(C))};
   const d=localStorage.getItem('d_'+slug);if(d!==null)al.dark=d==='1';
   const ev=(photo,kind,text)=>sb.rpc('add_event',{p_slug:slug,p_photo:photo,p_name:V.name,p_email:V.email,p_kind:kind,p_text:text||''}).then(r=>{if(r.error)toast('No se pudo enviar. Intenta de nuevo.')});
-  const show=()=>renderGallery(app,al,photos,{live:true,name:V.name,liked:L,comments:C,
-    like:id=>{const on=!L.has(id);on?L.add(id):L.delete(id);sv();show();ev(id,on?'like':'unlike')},
-    cmt:(id,t)=>{if(!t)return;C[id]=t;sv();toast('Sugerencia enviada');ev(id,'comment',t)},
+  const paint=()=>{app.querySelectorAll('[data-h]').forEach(b=>{const on=L.has(b.dataset.h);b.classList.toggle('on',on);b.innerHTML=heart(on)});const c=app.querySelector('[data-cnt]');if(c)c.textContent=L.size};
+  const toggle=(id,inLb)=>{const on=!L.has(id);on?L.add(id):L.delete(id);sv();ev(id,on?'like':'unlike');if(onlyFav&&!on&&!inLb)show();else paint()};
+  const show=()=>renderGallery(app,al,photos,{live:true,onlyFav,liked:L,toggle:id=>toggle(id),open:lbOpen,
+    fav:()=>{onlyFav=!onlyFav;show();window.scrollTo(0,0)},
     dark:()=>{al.dark=!al.dark;localStorage.setItem('d_'+slug,al.dark?'1':'0');show()}});
+  function lbOpen(id){
+    const list=onlyFav?photos.filter(p=>L.has(p.id)):photos;let i=Math.max(0,list.findIndex(p=>p.id===id));
+    const lb=document.createElement('div');lb.className='lb';lb.setAttribute('style',gvars(al));
+    lb.innerHTML=`<div class="lb-top"><span data-c></span><div><button class="lb-b" data-l="h" aria-label="Favorita"></button><button class="lb-b" data-l="x" aria-label="Cerrar">${ic(XI)}</button></div></div><div class="lb-stage"><button class="lb-n lb-p" data-l="p" aria-label="Anterior">${ic(LEFT)}</button><img alt="" draggable="false"><button class="lb-n lb-nx" data-l="n" aria-label="Siguiente">${ic(RIGHT)}</button></div><div class="lb-bot"><input placeholder="Escribe una sugerencia para esta foto" maxlength="400"><button class="lb-s" data-l="s">Enviar</button></div>`;
+    document.body.appendChild(lb);document.body.style.overflow='hidden';
+    const img=$('img',lb),inp=$('input',lb);
+    const draw=()=>{const p=list[i];img.src=p.url;$('[data-c]',lb).textContent=(i+1)+' de '+list.length;const on=L.has(p.id),h=$('[data-l=h]',lb);h.innerHTML=heart(on);h.style.color=on?al.accent:'';inp.value=C[p.id]||''};
+    const go=n=>{i=(i+n+list.length)%list.length;draw()};
+    const close=()=>{lb.remove();document.body.style.overflow='';document.removeEventListener('keydown',key);onlyFav?show():paint()};
+    const key=e=>{if(e.target.tagName==='INPUT'&&e.key!=='Escape')return;if(e.key==='Escape')close();else if(e.key==='ArrowLeft')go(-1);else if(e.key==='ArrowRight')go(1)};
+    document.addEventListener('keydown',key);
+    lb.oncontextmenu=e=>e.preventDefault();
+    lb.onclick=e=>{const b=e.target.closest('[data-l]');if(!b)return;const a=b.dataset.l;
+      if(a==='x')close();else if(a==='p')go(-1);else if(a==='n')go(1);
+      else if(a==='h'){toggle(list[i].id,true);draw()}
+      else if(a==='s'){const t=inp.value.trim();if(!t)return;C[list[i].id]=t;sv();ev(list[i].id,'comment',t);toast('Sugerencia enviada')}};
+    let x0=null;lb.addEventListener('touchstart',e=>{x0=e.touches[0].clientX},{passive:true});
+    lb.addEventListener('touchend',e=>{if(x0===null||e.target.tagName==='INPUT')return;const dx=e.changedTouches[0].clientX-x0;if(Math.abs(dx)>50)go(dx<0?1:-1);x0=null});
+    draw();
+  }
   if(V){show();return}
-  const k=col(al);document.body.style.background=k.bg;
-  const f=`width:100%;margin-bottom:8px;background:transparent;color:${k.fg};border:1px solid ${k.bd}`;
-  app.innerHTML=`<div style="background:${k.bg};color:${k.fg};font-family:${al.font};padding:10px"><div style="font-size:24px;margin-bottom:4px">${esc(al.title)}</div><div style="width:36px;height:3px;background:${al.accent};margin:6px 0 12px"></div>
-  <p style="font-size:14px;color:${k.mu};margin:0 0 12px">Para ver las fotos, ingresa tus datos.</p>
-  <input id="gn" placeholder="Tu nombre" style="${f}"><input id="ge" type="email" placeholder="tucorreo@ejemplo.com" style="${f}">
-  <div class="err" id="gr"></div><button id="go" style="width:100%;background:${al.accent};color:#fff;border:none">Ver galería</button></div>`;
-  $('#go').onclick=async()=>{
+  const first=photos[0];document.body.style.background=col(al).bg;
+  app.innerHTML=`<div class="gate" style="${gvars(al)}">${first?`<img class="gate-bg" src="${first.url}" alt="" draggable="false">`:''}<div class="gate-card"><h1 class="g-t" style="font-size:clamp(28px,7vw,40px)">${esc(al.title)}</h1><div class="g-line"></div><p style="color:var(--gmu);margin:0 0 18px;font-size:15px">Escribe tu nombre y tu correo para ver la galería.</p><input id="gn" placeholder="Tu nombre" autocomplete="name"><input id="ge" type="email" placeholder="tucorreo@ejemplo.com" autocomplete="email"><div class="err" id="gr"></div><button class="g-solid" id="go">Entrar a la galería</button></div></div>`;
+  $('#go').onclick=()=>{
     const name=$('#gn').value.trim(),email=$('#ge').value.trim();
     if(!name){$('#gr').textContent='Escribe tu nombre';return}
     if(!/^\S+@\S+\.\S+$/.test(email)){$('#gr').textContent='Escribe un correo válido';return}
@@ -157,9 +285,10 @@ async function clientMode(slug){
 const S={user:null,albums:[],a:null,photos:[],events:[],sub:'fotos',top:'albums',sample:null,wm:null,dz:null};
 async function adminMode(){const {data}=await sb.auth.getSession();if(data.session){S.user=data.session.user;home()}else login()}
 function login(msg){
-  app.innerHTML=`<h2>Galería para fotógrafos</h2><div class="card"><div class="fld">Correo<input id="em" type="email" autocomplete="email"></div>
-  <div class="fld">Contraseña (mínimo 6 caracteres)<input id="pw" type="password" autocomplete="current-password"></div>
-  <div class="err" id="er">${esc(msg||'')}</div><div class="row"><button class="pri" onclick="auth('in')">Entrar</button><button onclick="auth('up')">Crear cuenta</button></div></div>`;
+  app.innerHTML=`<div class="login"><h1>Galería</h1><p class="mu" style="margin:0 0 22px">Entra para administrar tus sesiones y compartirlas con tus clientes.</p>
+  <div class="fld">Correo<input id="em" type="email" autocomplete="email"></div>
+  <div class="fld">Contraseña<input id="pw" type="password" autocomplete="current-password" placeholder="Mínimo 6 caracteres"></div>
+  <div class="err" id="er">${esc(msg||'')}</div><div class="row"><button class="btn pri" onclick="auth('in')">Entrar</button><button class="btn" onclick="auth('up')">Crear cuenta</button></div></div>`;
 }
 async function auth(m){
   const email=$('#em').value.trim(),password=$('#pw').value;
@@ -168,92 +297,126 @@ async function auth(m){
   if(!r.data.session){$('#er').textContent='Revisa tu correo para confirmar la cuenta y luego entra.';return}
   S.user=r.data.session.user;home();
 }
-async function logout(){await sb.auth.signOut();S.user=null;clearInterval(timer);login()}
-const bar=()=>`<div class="row" style="justify-content:space-between;margin-bottom:6px"><h2 style="margin:0">Galería</h2><div class="row"><button onclick="toggleTheme()">Tema</button><button onclick="logout()">Salir</button></div></div>`;
+async function logout(){await sb.auth.signOut();S.user=null;S.a=null;clearInterval(timer);login()}
+const top=()=>`<header class="top"><div class="brand">Galería</div><nav><button class="${S.top==='albums'&&!S.a?'on':''}" onclick="S.top='albums';home()">Colecciones</button><button class="${S.top==='panel'?'on':''}" onclick="S.top='panel';home()">Actividad</button></nav><div class="row" style="gap:0"><button class="ib" onclick="toggleTheme()" aria-label="Cambiar tema">${ic(document.documentElement.dataset.theme==='dark'?SUN:MOON)}</button><button class="ib" onclick="logout()">Salir</button></div></header>`;
 async function home(){
   clearInterval(timer);S.a=null;
-  const {data}=await sb.from('albums').select('*, photos(count)').order('created_at',{ascending:false});S.albums=data||[];
-  app.innerHTML=bar()+`<div class="tabs"><button class="${S.top==='albums'?'on':''}" onclick="S.top='albums';home()">Álbumes</button><button class="${S.top==='panel'?'on':''}" onclick="S.top='panel';home()">Panel</button></div><div id="body"></div>`;
+  const [a,p]=await Promise.all([sb.from('albums').select('*').order('created_at',{ascending:false}),sb.from('photos').select('album_id,path,position,created_at').order('position').order('created_at')]);
+  S.albums=a.data||[];const m={};(p.data||[]).forEach(x=>{(m[x.album_id]=m[x.album_id]||[]).push(x)});S.albums.forEach(x=>{x._p=m[x.id]||[]});
+  app.innerHTML=top()+'<main class="wrap" id="body"></main>';
   if(S.top==='panel')return panel();
-  $('#body').innerHTML=`<div class="row" style="margin-bottom:12px"><input id="na" placeholder="Nombre del álbum" style="flex:1;min-width:0"><button class="pri" onclick="addAlbum()">Crear</button></div>
-  ${S.albums.map(a=>`<div class="card" style="cursor:pointer" onclick="openAlbum('${a.id}')"><div>${esc(a.name)}</div><div class="mu">${a.photos&&a.photos[0]?a.photos[0].count:0} fotos</div></div>`).join('')||'<p class="mu">Crea tu primer álbum para empezar.</p>'}`;
+  $('#body').innerHTML=`<div class="row" style="margin-bottom:22px;flex-wrap:nowrap"><input id="na" placeholder="Nombre de la nueva colección" style="flex:1;min-width:0"><button class="btn pri" onclick="addAlbum()">Crear</button></div>
+  ${S.albums.length?`<div class="cols">${S.albums.map(x=>`<div class="col" onclick="openAlbum('${x.id}','fotos')"><div class="cv">${x._p[0]?`<img src="${pub(x._p[0].path)}" alt="">`:'Sin fotos'}</div><b>${esc(x.name)}</b><span class="mu">${x._p.length} fotos</span></div>`).join('')}</div>`:'<div class="card" style="text-align:center"><h2 style="margin-bottom:6px">Crea tu primera colección</h2><p class="mu" style="margin:0">Una colección es una sesión de fotos que compartes con un cliente. Escribe un nombre arriba para empezar.</p></div>'}`;
 }
 async function addAlbum(){
-  const n=$('#na').value.trim();if(!n){$('#na').placeholder='Escribe un nombre';return}
-  const {data,error}=await sb.from('albums').insert({name:n,title:n}).select().single();
+  const n=$('#na').value.trim();if(!n){$('#na').placeholder='Escribe un nombre';$('#na').focus();return}
+  const {data,error}=await sb.from('albums').insert({name:n,title:n,font:FONTS[0][0],accent:'#A88B5A',layout:'mas'}).select().single();
   if(error)return toast(error.message);
-  S.albums.unshift(data);openAlbum(data.id);
+  data._p=[];S.albums.unshift(data);openAlbum(data.id,'fotos');
 }
+const link=()=>location.origin+location.pathname+'?g='+S.a.slug;
 async function openAlbum(id,sub){
   clearInterval(timer);
   S.a=S.albums.find(x=>x.id===id)||S.a;S.sub=sub||S.sub||'fotos';
   const [p,e]=await Promise.all([
     sb.from('photos').select('*').eq('album_id',S.a.id).order('position').order('created_at'),
     sb.from('events').select('*').eq('album_id',S.a.id).order('created_at',{ascending:false}).limit(500)]);
-  S.photos=(p.data||[]).map(x=>Object.assign({},x,{url:pub(x.path)}));S.events=e.data||[];
+  S.photos=(p.data||[]).map(mapPhoto);S.events=e.data||[];
+  S.a._p=S.photos;
   S.wm=Object.assign({type:'text',text:'Mi estudio',png:null,size:7,op:45,dens:3,rot:-25},S.a.wm||{});
   S.dz={title:S.a.title||S.a.name,subtitle:S.a.subtitle||'',font:S.a.font,accent:S.a.accent,layout:S.a.layout,dark:!!S.a.dark,cover:S.a.cover!==false};
   viewAlbum();
 }
 function viewAlbum(){
-  const T=[['fotos','Fotos'],['marca','Marca de agua'],['diseno','Diseño'],['sel','Selección'],['link','Enlace']];
-  app.innerHTML=bar()+`<div class="row"><button onclick="S.top='albums';home()">‹ Álbumes</button><b>${esc(S.a.name)}</b></div>
-  <div class="tabs">${T.map(t=>`<button class="${S.sub===t[0]?'on':''}" onclick="S.sub='${t[0]}';viewAlbum()">${t[1]}</button>`).join('')}</div><div id="body"></div>`;
-  ({fotos:subFotos,marca:subMarca,diseno:subDiseno,sel:subSel,link:subLink})[S.sub]();
+  const T=[['fotos','Fotos'],['sel','Selección'],['diseno','Diseño'],['marca','Marca de agua'],['ajustes','Ajustes']];
+  app.innerHTML=top()+`<main class="wrap"><button class="back" onclick="S.top='albums';home()">‹ Colecciones</button>
+  <div class="ah"><div><h1>${esc(S.a.name)}</h1><div class="mu">${S.photos.length} fotos</div></div><div class="row"><a class="btn" href="${esc(link())}" target="_blank" rel="noopener">Ver como cliente</a><button class="btn pri" onclick="copyLink()">Copiar enlace</button></div></div>
+  <nav class="tabs">${T.map(t=>`<button class="${S.sub===t[0]?'on':''}" onclick="S.sub='${t[0]}';viewAlbum()">${t[1]}</button>`).join('')}</nav><div id="body"></div></main>`;
+  ({fotos:subFotos,sel:subSel,diseno:subDiseno,marca:subMarca,ajustes:subAjustes})[S.sub]();
+}
+function copyLink(){
+  const u=link();
+  (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(()=>toast('Enlace copiado')).catch(()=>{prompt('Copia este enlace:',u)});
 }
 function selMap(){
-  const m={},seen={};
-  const get=id=>m[id]||(m[id]={likes:[],cm:[]});
+  const m={},seen={};const get=id=>m[id]||(m[id]={likes:[],cm:[]});
   for(const e of S.events){if(!e.photo_id)continue;const k=e.photo_id+'|'+e.viewer_email;
     if((e.kind==='like'||e.kind==='unlike')&&!seen[k]){seen[k]=1;if(e.kind==='like')get(e.photo_id).likes.push(e.viewer_name)}}
   for(const e of S.events)if(e.kind==='comment'&&e.photo_id)get(e.photo_id).cm.push(e);
   return m;
 }
+/* Fotos */
 function subFotos(){
   const m=selMap();
-  $('#body').innerHTML=`<div class="row" style="margin-bottom:8px"><label class="btn">Subir fotos<input type="file" multiple accept="image/*,.cr2,.cr3,.nef,.arw,.dng,.raf,.orf,.rw2" hidden onchange="upl(this.files)"></label><button class="dng" onclick="delAlbum()">Borrar álbum</button></div>
-  <div class="mu" id="st">Las fotos se reducen a 1600 px y se les pone la marca de agua al subirlas. El archivo original no se guarda en el servidor.</div>
-  <div class="grid" style="margin-top:10px">${S.photos.map(p=>`<div><div class="img" style="aspect-ratio:1.3"><img src="${p.url}" alt=""><button class="x" onclick="delPh('${p.id}')" aria-label="Borrar">✕</button></div>
-  <div class="mu" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.name)}${m[p.id]&&m[p.id].likes.length?' · ♥ '+m[p.id].likes.length:''}</div></div>`).join('')}</div>`;
+  $('#body').innerHTML=`<label class="drop"><input type="file" multiple accept="image/*,.cr2,.cr3,.nef,.arw,.dng,.raf,.orf,.rw2" hidden onchange="upl(this.files)"><div style="font-weight:500">Toca para subir fotos</div><div class="mu">JPG, PNG o RAW. Se reducen a 1600 px y reciben tu marca de agua al subir.</div></label>
+  <div class="bar"><i id="pb"></i></div><div class="mu" id="st" style="margin:-6px 0 14px;min-height:18px"></div>
+  ${S.photos.length?`<div class="pg">${S.photos.map((p,i)=>`<div class="pt"><img src="${p.url}" alt="" loading="lazy"><button class="pb" style="right:42px" onclick="setCover('${p.id}')" aria-label="Usar como portada">${ic(STAR)}</button><button class="pb" style="right:6px" onclick="delPh('${p.id}')" aria-label="Borrar foto">${ic(XI)}</button>${i===0?'<span class="tag">Portada</span>':p.ar?`<span class="tag">${p.ar<1?'Vertical':p.ar>1?'Horizontal':'Cuadrada'}</span>`:''}${m[p.id]&&m[p.id].likes.length?`<span class="tag" style="left:auto;right:6px">♥ ${m[p.id].likes.length}</span>`:''}</div>`).join('')}</div>`:'<p class="mu" style="text-align:center">Aún no hay fotos en esta colección.</p>'}`;
 }
 async function upl(files){
-  const st=$('#st');let n=0;const base=S.photos.length;
+  const st=$('#st'),pb=$('#pb'),N=files.length;let n=0;const base=Math.max(0,...S.photos.map(p=>p.position||0));
   for(const f of files){
-    n++;st.textContent='Subiendo '+n+' de '+files.length+': '+f.name+'…';
+    n++;st.textContent='Subiendo '+n+' de '+N+': '+f.name;
     try{
-      const blob=await bake(f,S.wm);
-      const path=S.user.id+'/'+S.a.id+'/'+crypto.randomUUID()+'.jpg';
+      const {blob,W,H}=await bake(f,S.wm);
+      const path=S.user.id+'/'+S.a.id+'/'+crypto.randomUUID()+'_'+W+'x'+H+'.jpg';
       let r=await sb.storage.from('gallery').upload(path,blob,{contentType:'image/jpeg'});if(r.error)throw r.error;
       r=await sb.from('photos').insert({album_id:S.a.id,path,name:f.name,position:base+n});if(r.error)throw r.error;
-    }catch(e){toast(e.message||'Error al subir');}
+    }catch(e){toast(e.message||'Error al subir')}
+    pb.style.width=(n/N*100)+'%';
   }
-  openAlbum(S.a.id,'fotos');
+  toast('Fotos subidas');openAlbum(S.a.id,'fotos');
+}
+async function setCover(id){
+  const min=Math.min(0,...S.photos.map(p=>p.position||0))-1;
+  const {error}=await sb.from('photos').update({position:min}).eq('id',id);if(error)return toast(error.message);
+  toast('Portada actualizada');openAlbum(S.a.id,'fotos');
 }
 async function delPh(id){
   const p=S.photos.find(x=>x.id===id);
   await sb.storage.from('gallery').remove([p.path]);await sb.from('photos').delete().eq('id',id);openAlbum(S.a.id,'fotos');
 }
-async function delAlbum(){
-  if(!confirm('¿Borrar el álbum y todas sus fotos?'))return;
-  if(S.photos.length)await sb.storage.from('gallery').remove(S.photos.map(p=>p.path));
-  await sb.from('albums').delete().eq('id',S.a.id);S.top='albums';home();
+/* Selección */
+function subSel(){
+  const m=selMap(),ids=Object.keys(m).filter(id=>m[id].likes.length||m[id].cm.length);
+  const per={};ids.forEach(id=>m[id].likes.forEach(n=>{per[n]=(per[n]||0)+1}));
+  $('#body').innerHTML=ids.length?`<div class="chips">${Object.keys(per).map(n=>`<span class="chip">${esc(n)}: ${per[n]} favoritas</span>`).join('')}</div>`+ids.map(id=>{const p=S.photos.find(x=>x.id===id);if(!p)return '';
+    return `<div class="item"><img src="${p.url}" alt=""><div style="min-width:0;flex:1"><div style="font-weight:500">${esc(p.name)}</div>${m[id].likes.length?`<div class="mu">Favorita de ${m[id].likes.map(esc).join(', ')}</div>`:''}${m[id].cm.map(c=>`<div class="mu">${esc(c.viewer_name)} sugiere: “${esc(c.body)}”</div>`).join('')}</div></div>`}).join('')
+    :'<div class="card" style="text-align:center"><h2 style="margin-bottom:6px">Aún no hay favoritas</h2><p class="mu" style="margin:0">Copia el enlace y envíaselo a tu cliente. Lo que elija aparecerá aquí.</p></div>';
 }
+/* Diseño */
+function refDz(){renderGallery($('#dz'),S.dz,S.photos,{live:false,liked:new Set(),onlyFav:false})}
+function preset(i){Object.assign(S.dz,PRESETS[i][1]);subDiseno()}
+function subDiseno(){
+  const d=S.dz;const known=FONTS.some(f=>f[0]===d.font);
+  $('#body').innerHTML=`<div class="mu" style="margin-bottom:8px">Así verá tu cliente la galería (sube al menos una foto para ver la portada):</div><div class="pvf"><div id="dz"></div></div>
+  <div class="chips">${PRESETS.map((p,i)=>`<button class="chip" onclick="preset(${i})">${p[0]}</button>`).join('')}</div>
+  <div class="fld">Título<input value="${esc(d.title)}" oninput="S.dz.title=this.value;refDz()"></div>
+  <div class="fld">Mensaje para tu cliente<input value="${esc(d.subtitle)}" oninput="S.dz.subtitle=this.value;refDz()"></div>
+  <div class="fld">Tipo de letra<select onchange="S.dz.font=this.value;refDz()">${known?'':`<option selected value="${esc(d.font)}">Actual</option>`}${FONTS.map(f=>`<option value="${esc(f[0])}" ${d.font===f[0]?'selected':''}>${f[1]}</option>`).join('')}</select></div>
+  <div class="g2"><div class="fld">Color de acento<input type="color" value="${esc(d.accent)}" oninput="S.dz.accent=this.value;refDz()"></div>
+  <div class="fld">Distribución<select onchange="S.dz.layout=this.value;refDz()"><option value="mas" ${d.layout==='mas'?'selected':''}>Mosaico</option><option value="grid" ${d.layout==='grid'?'selected':''}>Filas ajustadas</option><option value="big" ${d.layout==='big'?'selected':''}>Una columna</option></select></div></div>
+  <label class="row" style="margin-bottom:8px"><input type="checkbox" ${d.dark?'checked':''} onchange="S.dz.dark=this.checked;refDz()"> Modo oscuro por defecto</label>
+  <label class="row" style="margin-bottom:16px"><input type="checkbox" ${d.cover?'checked':''} onchange="S.dz.cover=this.checked;refDz()"> Portada a pantalla completa</label>
+  <button class="btn pri" onclick="saveDz()">Guardar diseño</button>`;
+  refDz();
+}
+async function saveDz(){const d=S.dz;const {error}=await sb.from('albums').update({title:d.title,subtitle:d.subtitle,font:d.font,accent:d.accent,layout:d.layout,dark:d.dark,cover:d.cover}).eq('id',S.a.id);if(error)return toast(error.message);Object.assign(S.a,d);toast('Diseño guardado')}
 /* Marca de agua */
 function cover(x,bm,W,H){const s=Math.max(W/bm.width,H/bm.height),w=bm.width*s,h=bm.height*s;x.drawImage(bm,(W-w)/2,(H-h)/2,w,h)}
 async function drawPv(){
   const c=$('#pv'),x=c.getContext('2d'),W=c.width,H=c.height;
   if(S.sample)cover(x,S.sample,W,H);
-  else{x.fillStyle='#9fb6c8';x.fillRect(0,0,W,H);x.fillStyle='#4b5d4a';x.beginPath();x.moveTo(0,H);x.lineTo(0,H*.65);x.quadraticCurveTo(W*.4,H*.3,W*.7,H*.65);x.lineTo(W,H*.6);x.lineTo(W,H);x.fill()}
+  else{x.fillStyle='#a9bccb';x.fillRect(0,0,W,H);x.fillStyle='#51604f';x.beginPath();x.moveTo(0,H);x.lineTo(0,H*.65);x.quadraticCurveTo(W*.4,H*.3,W*.7,H*.65);x.lineTo(W,H*.6);x.lineTo(W,H);x.fill()}
   await mark(x,W,H,S.wm);
 }
 function rg(t,k,mn,mx){return `<div class="fld">${t}: <span id="v_${k}" style="color:var(--fg)">${S.wm[k]}</span><input type="range" min="${mn}" max="${mx}" step="1" value="${S.wm[k]}" oninput="S.wm.${k}=+this.value;$('#v_${k}').textContent=this.value;drawPv()"></div>`}
 function subMarca(){
   const w=S.wm;
-  $('#body').innerHTML=`<canvas id="pv" width="640" height="427"></canvas><div class="row" style="margin:8px 0"><label class="btn">Usar mi foto de muestra<input type="file" accept="image/*,.cr2,.cr3,.nef,.arw,.dng" hidden onchange="setSample(this.files[0])"></label></div>
+  $('#body').innerHTML=`<canvas id="pv" width="900" height="600"></canvas><div class="row" style="margin:10px 0 18px"><label class="btn">Probar con mi foto<input type="file" accept="image/*,.cr2,.cr3,.nef,.arw,.dng" hidden onchange="setSample(this.files[0])"></label></div>
   <div class="fld">Tipo<select onchange="S.wm.type=this.value;subMarca()"><option value="text" ${w.type==='text'?'selected':''}>Texto</option><option value="png" ${w.type==='png'?'selected':''}>Logo PNG</option></select></div>
   ${w.type==='text'?`<div class="fld">Texto<input value="${esc(w.text)}" oninput="S.wm.text=this.value;drawPv()"></div>`:`<div class="fld">Logo PNG<input type="file" accept="image/png" onchange="setLogo(this.files[0])"></div>`}
-  ${rg('Tamaño','size',2,20)}${rg('Opacidad','op',10,100)}${rg('Cantidad (repeticiones)','dens',1,6)}${rg('Rotación','rot',-60,60)}
-  <button class="pri" onclick="saveWm()">Guardar marca de agua</button><p class="mu">Se aplica a las fotos que subas después de guardar. Las que ya están subidas no cambian.</p>`;
+  ${rg('Tamaño','size',2,20)}${rg('Opacidad','op',10,100)}${rg('Cantidad de repeticiones','dens',1,6)}${rg('Rotación','rot',-60,60)}
+  <button class="btn pri" onclick="saveWm()">Guardar marca de agua</button><p class="mu">Se aplica a las fotos que subas después de guardar. Las que ya están subidas no cambian.</p>`;
   drawPv();
 }
 async function setSample(f){if(!f)return;try{S.sample=await decode(f);drawPv()}catch(e){toast(e.message)}}
@@ -263,51 +426,34 @@ async function setLogo(f){
   S.wm.png=c.toDataURL('image/png');drawPv();
 }
 async function saveWm(){const {error}=await sb.from('albums').update({wm:S.wm}).eq('id',S.a.id);if(error)return toast(error.message);S.a.wm=Object.assign({},S.wm);toast('Marca de agua guardada')}
-/* Diseño */
-function refDz(){renderGallery($('#dz'),S.dz,S.photos,{live:false,name:'Cliente'})}
-function subDiseno(){
-  const d=S.dz;
-  $('#body').innerHTML=`<div class="mu" style="margin-bottom:6px">Así verá tu cliente la página:</div><div id="dz" style="margin-bottom:14px"></div>
-  <div class="fld">Título<input value="${esc(d.title)}" oninput="S.dz.title=this.value;refDz()"></div>
-  <div class="fld">Referencia o mensaje<input value="${esc(d.subtitle)}" oninput="S.dz.subtitle=this.value;refDz()"></div>
-  <div class="fld">Fuente<select onchange="S.dz.font=this.value;refDz()">${FONTS.map(f=>`<option value="${esc(f[0])}" ${d.font===f[0]?'selected':''}>${f[1]}</option>`).join('')}</select></div>
-  <div class="grid"><div class="fld">Color de acento<input type="color" value="${d.accent}" oninput="S.dz.accent=this.value;refDz()"></div>
-  <div class="fld">Distribución<select onchange="S.dz.layout=this.value;refDz()"><option value="grid" ${d.layout==='grid'?'selected':''}>Cuadrícula</option><option value="mas" ${d.layout==='mas'?'selected':''}>Mosaico</option><option value="big" ${d.layout==='big'?'selected':''}>Una columna</option></select></div></div>
-  <label class="row" style="margin-bottom:6px"><input type="checkbox" ${d.dark?'checked':''} onchange="S.dz.dark=this.checked;refDz()"> Modo oscuro por defecto</label>
-  <label class="row" style="margin-bottom:12px"><input type="checkbox" ${d.cover?'checked':''} onchange="S.dz.cover=this.checked;refDz()"> Mostrar portada</label>
-  <button class="pri" onclick="saveDz()">Guardar diseño</button>`;
-  refDz();
+/* Ajustes */
+function subAjustes(){
+  $('#body').innerHTML=`<div class="fld">Nombre de la colección<input id="rn" value="${esc(S.a.name)}"></div><button class="btn pri" onclick="rename()">Guardar nombre</button>
+  <div class="fld" style="margin-top:26px">Enlace para tu cliente<input value="${esc(link())}" readonly onclick="this.select()"></div>
+  <p class="mu">El cliente debe poner su nombre y correo para ver las fotos. Lo que elija lo verás en Selección y en Actividad.</p>
+  <div style="margin-top:30px"><button class="btn dng" onclick="delAlbum()">Borrar colección</button></div>`;
 }
-async function saveDz(){const d=S.dz;const {error}=await sb.from('albums').update({title:d.title,subtitle:d.subtitle,font:d.font,accent:d.accent,layout:d.layout,dark:d.dark,cover:d.cover}).eq('id',S.a.id);if(error)return toast(error.message);Object.assign(S.a,d);toast('Diseño guardado')}
-/* Selección y enlace */
-function subSel(){
-  const m=selMap(),ids=Object.keys(m).filter(id=>m[id].likes.length||m[id].cm.length);
-  $('#body').innerHTML=ids.length?ids.map(id=>{const p=S.photos.find(x=>x.id===id);if(!p)return '';
-    return `<div class="item"><img src="${p.url}" alt=""><div style="min-width:0;flex:1"><div style="font-size:14px">${esc(p.name)}</div>${m[id].likes.length?`<div class="mu">♥ ${m[id].likes.map(esc).join(', ')}</div>`:''}${m[id].cm.map(c=>`<div class="mu">${esc(c.viewer_name)}: “${esc(c.body)}”</div>`).join('')}</div></div>`}).join('')
-    :'<p class="mu">Aún no hay fotos elegidas. Comparte el enlace con tu cliente.</p>';
+async function rename(){const n=$('#rn').value.trim();if(!n)return;const {error}=await sb.from('albums').update({name:n}).eq('id',S.a.id);if(error)return toast(error.message);S.a.name=n;toast('Nombre guardado');viewAlbum()}
+async function delAlbum(){
+  if(!confirm('¿Borrar la colección y todas sus fotos? No se puede deshacer.'))return;
+  if(S.photos.length)await sb.storage.from('gallery').remove(S.photos.map(p=>p.path));
+  await sb.from('albums').delete().eq('id',S.a.id);S.top='albums';home();
 }
-function subLink(){
-  const url=location.origin+location.pathname+'?g='+S.a.slug;
-  $('#body').innerHTML=`<div class="fld">Enlace para tu cliente<input id="lk" value="${esc(url)}" readonly onclick="this.select()"></div><button class="pri" onclick="copyLink()">Copiar enlace</button>
-  <p class="mu">El cliente debe poner su nombre y correo para ver las fotos. Verás lo que elija en el Panel y en la pestaña Selección.</p>`;
-}
-function copyLink(){const i=$('#lk');i.select();(navigator.clipboard?navigator.clipboard.writeText(i.value):Promise.reject()).then(()=>toast('Enlace copiado')).catch(()=>{document.execCommand('copy');toast('Enlace copiado')})}
-/* Panel */
-const TXT={enter:'entró a la galería',like:'marcó me gusta',unlike:'quitó su me gusta',comment:'dejó una sugerencia'};
+/* Actividad */
+const TXT={enter:'entró a la galería',like:'marcó una favorita',unlike:'quitó una favorita',comment:'dejó una sugerencia'};
 async function panel(){
   const {data}=await sb.from('events').select('*, albums(name), photos(path,name)').order('created_at',{ascending:false}).limit(100);
   const ev=data||[];const c=k=>ev.filter(e=>e.kind===k).length;
-  const M=(l,v)=>`<div class="card" style="margin:0"><div class="mu">${l}</div><div style="font-size:24px">${v}</div></div>`;
-  $('#body').innerHTML=`<div class="grid" style="margin-bottom:12px">${M('Entradas',c('enter'))}${M('Me gusta',c('like'))}${M('Sugerencias',c('comment'))}${M('Eventos recientes',ev.length)}</div>
-  <div class="mu" style="margin-bottom:4px">Se actualiza solo cada 20 segundos.</div>
-  ${ev.map(e=>`<div class="item">${e.photos?`<img src="${pub(e.photos.path)}" alt="">`:'<div class="dot">●</div>'}<div style="min-width:0;flex:1"><div style="font-size:14px"><b style="font-weight:500">${esc(e.viewer_name)}</b> ${TXT[e.kind]||''}${e.kind==='comment'?': “'+esc(e.body)+'”':''}</div>
-  <div class="mu" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(e.viewer_email)} · ${esc(e.albums?e.albums.name:'')} · ${when(e.created_at)}</div></div></div>`).join('')||'<p class="mu">Aún no hay actividad.</p>'}`;
+  const M=(l,v)=>`<div class="stat"><div class="mu">${l}</div><div>${v}</div></div>`;
+  $('#body').innerHTML=`<div class="g2" style="margin-bottom:22px">${M('Visitas',c('enter'))}${M('Favoritas',c('like')-c('unlike'))}${M('Sugerencias',c('comment'))}${M('Actividad reciente',ev.length)}</div>
+  ${ev.map(e=>`<div class="item">${e.photos?`<img src="${pub(e.photos.path)}" alt="">`:`<div class="av">${esc((e.viewer_name||'?').trim().charAt(0).toUpperCase())}</div>`}<div style="min-width:0;flex:1"><div><b style="font-weight:500">${esc(e.viewer_name)}</b> ${TXT[e.kind]||''}${e.kind==='comment'?': “'+esc(e.body)+'”':''}</div>
+  <div class="mu" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(e.viewer_email)} en ${esc(e.albums?e.albums.name:'')}, ${when(e.created_at)}</div></div></div>`).join('')||'<div class="card" style="text-align:center"><h2 style="margin-bottom:6px">Todavía no hay actividad</h2><p class="mu" style="margin:0">Cuando tus clientes abran sus enlaces, verás aquí quién entró y qué eligió.</p></div>'}`;
   clearInterval(timer);timer=setInterval(()=>{if(S.top==='panel'&&!S.a&&$('#body'))panel()},20000);
 }
 
 /* ---------- Arranque ---------- */
 if(!configured){
-  app.innerHTML='<h2>Falta configurar</h2><p>Abre este archivo y reemplaza SUPABASE_URL y SUPABASE_KEY (al inicio del script) con los datos de tu proyecto de Supabase.</p>';
+  app.innerHTML='<div class="login"><h1>Falta configurar</h1><p>Abre este archivo y reemplaza SUPABASE_URL y SUPABASE_KEY con los datos de tu proyecto de Supabase.</p></div>';
 }else if(SLUG){clientMode(SLUG)}else{adminMode()}
 </script>
 </body>
