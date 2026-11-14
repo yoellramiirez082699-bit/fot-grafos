@@ -1,0 +1,579 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LumenStudio — Galerías y Gestión Fotográfica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Playfair+Display:wght@400;500;600&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fbfaf7;--s:#f2f0ea;--fg:#1a1918;--mu:#73716b;--bd:#e3e0d8;--er:#c24137;
+  --accent:#b89753;--radius:16px;--shadow:0 10px 30px -10px rgba(0,0,0,.05);
+}
+[data-theme=dark]{
+  --bg:#0e0e0d;--s:#161615;--fg:#f3f1ec;--mu:#94928b;--bd:#262624;--er:#e05246;
+  --accent:#d4af37;--shadow:0 10px 30px -10px rgba(0,0,0,.4);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.6 'Plus Jakarta Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased;transition:background .3s,color .3s}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3{font-family:'Playfair Display',serif;font-weight:500;margin:0;letter-spacing:-.01em}
+
+.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 20px;padding:16px 28px;border-bottom:1px solid var(--bd);position:sticky;top:0;background:var(--bg);backdrop-filter:blur(12px);background-color:rgba(251,250,247,0.85);z-index:40;transition:background-color .3s}
+[data-theme=dark] .top{background-color:rgba(14,14,13,0.85)}
+.brand{font-family:'Playfair Display',serif;font-weight:600;font-size:20px;letter-spacing:.02em;color:var(--accent)}
+.top nav{display:flex;gap:6px;order:3;width:100%}
+@media(min-width:768px){.top nav{order:0;width:auto}}
+.top nav button{border:0;background:transparent;padding:8px 16px;border-radius:999px;color:var(--mu);cursor:pointer;font-weight:500;transition:all .2s}
+.top nav button:hover{color:var(--fg)}
+.top nav button.on{background:var(--s);color:var(--fg);box-shadow:var(--shadow)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--bd);background:transparent;border-radius:999px;padding:10px 20px;cursor:pointer;text-decoration:none;color:var(--fg);font-size:14px;font-weight:500;white-space:nowrap;transition:all .2s}
+.btn:hover{border-color:var(--fg);transform:translateY(-1px)}
+.btn.pri{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.btn.pri:hover{opacity:.9}
+.btn.dng{color:var(--er);border-color:var(--bd)}
+.ib{border:0;background:var(--s);cursor:pointer;padding:8px 12px;border-radius:12px;display:inline-flex;align-items:center;color:var(--fg);transition:transform .2s}
+.ib:hover{transform:scale(1.05)}
+.wrap{max-width:1200px;margin:0 auto;padding:32px 24px 80px}
+input,select{background:var(--bg);border:1px solid var(--bd);border-radius:12px;padding:12px 16px;width:100%;outline:none;transition:border-color .2s}
+input:focus,select:focus{border-color:var(--accent)}
+input[type=checkbox]{width:auto}
+input[type=range]{padding:0;accent-color:var(--accent)}
+input[type=color]{height:46px;padding:4px;border-radius:12px;cursor:pointer}
+.fld{margin-bottom:18px;font-size:13px;font-weight:500;color:var(--mu)}
+.fld>input,.fld>select{margin-top:6px;font-size:15px;color:var(--fg)}
+.mu{color:var(--mu);font-size:13px}
+.err{color:var(--er);font-size:14px;min-height:22px;margin-top:4px}
+.card{border:1px solid var(--bd);background:var(--s);border-radius:var(--radius);padding:24px;margin-bottom:16px;box-shadow:var(--shadow)}
+.login{max-width:400px;margin:14vh auto 0;padding:0 24px}
+.login h1{font-size:36px;margin-bottom:8px}
+.tabs{display:flex;gap:28px;border-bottom:1px solid var(--bd);overflow-x:auto;margin:24px 0 28px}
+.tabs button{border:0;background:transparent;padding:12px 0;color:var(--mu);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;font-weight:500;transition:color .2s}
+.tabs button.on{color:var(--fg);border-color:var(--accent)}
+.cols{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:20px}
+@media(min-width:640px){.cols{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(min-width:1024px){.cols{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.col{cursor:pointer;background:var(--s);border:1px solid var(--bd);border-radius:var(--radius);overflow:hidden;transition:all .3s}
+.col:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:var(--accent)}
+.col .cv{aspect-ratio:16/10;overflow:hidden;background:var(--bg);display:flex;align-items:center;justify-content:center;color:var(--mu);font-size:13px}
+.col .cv img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.col:hover .cv img{transform:scale(1.03)}
+.col-info{padding:16px 20px;display:flex;justify-content:space-between;align-items:center}
+.col b{display:block;font-family:'Playfair Display',serif;font-weight:600;font-size:18px;margin-bottom:4px}
+.ah{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:10px}
+.ah h1{font-size:32px}
+.back{border:0;background:transparent;color:var(--mu);cursor:pointer;padding:0 0 12px;font-size:14px;font-weight:500;display:inline-flex;align-items:center;gap:6px}
+.back:hover{color:var(--fg)}
+.drop{display:block;border:2px dashed var(--bd);background:var(--s);border-radius:var(--radius);padding:40px 24px;text-align:center;cursor:pointer;transition:all .2s}
+.drop:hover{border-color:var(--accent);background:var(--bg)}
+.bar{height:4px;background:var(--bd);border-radius:2px;overflow:hidden;margin:16px 0}
+.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+.pg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media(min-width:768px){.pg{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.pt{position:relative;aspect-ratio:1;border-radius:14px;overflow:hidden;background:var(--s);border:1px solid var(--bd)}
+.pt img{width:100%;height:100%;object-fit:cover;display:block}
+.pb{position:absolute;top:8px;width:34px;height:34px;border-radius:50%;border:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .2s}
+.pb:hover{transform:scale(1.1)}
+.tag{position:absolute;left:8px;bottom:8px;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);color:#fff;font-size:11px;font-weight:500;padding:3px 10px;border-radius:999px}
+.item{display:flex;gap:16px;align-items:center;padding:16px 0;border-top:1px solid var(--bd)}
+.item img{width:56px;height:56px;object-fit:cover;border-radius:12px;flex:none}
+.av{width:56px;height:56px;border-radius:50%;background:var(--s);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-weight:600;flex:none}
+.chips{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+.chip{border:1px solid var(--bd);border-radius:999px;padding:8px 18px;font-size:13px;font-weight:500;background:var(--s);cursor:pointer;transition:all .2s}
+.chip:hover{border-color:var(--accent)}
+.chip.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.stat{background:var(--s);border:1px solid var(--bd);border-radius:var(--radius);padding:20px}
+.stat div:first-child{font-size:13px;font-weight:500;color:var(--mu);margin-bottom:6px}
+.stat div:last-child{font-size:30px;font-family:'Playfair Display',serif;font-weight:600}
+.g2{display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:16px}
+@media(min-width:768px){.g2{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.pvf{border:1px solid var(--bd);border-radius:var(--radius);overflow:hidden;max-height:600px;overflow-y:auto;margin-bottom:20px;box-shadow:var(--shadow)}
+canvas{width:100%;display:block}
+#toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:12px 24px;border-radius:999px;font-size:14px;font-weight:500;display:none;z-index:99;box-shadow:0 10px 30px rgba(0,0,0,0.2)}
+
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.modal-box{background:var(--bg);color:var(--fg);border:1px solid var(--bd);border-radius:24px;padding:32px;max-width:400px;width:100%;text-align:center;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25)}
+.modal-box h3{margin-top:0;font-size:22px;margin-bottom:10px}
+.modal-box p{color:var(--mu);font-size:15px;margin-bottom:24px;line-height:1.5}
+.modal-actions{display:flex;gap:12px;justify-content:center}
+
+/* Estilos de la galería cliente */
+.g{background:var(--gbg);color:var(--gfg);font-family:var(--gfont),sans-serif;min-height:100svh;transition:background .3s,color .3s}
+.g-hero{position:relative;height:var(--hh);overflow:hidden;color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;padding:32px}
+.g-hero>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;animation:gz 1.8s cubic-bezier(0.16,1,0.3,1) both}
+@keyframes gz{from{opacity:0;transform:scale(1.06)}to{opacity:1;transform:none}}
+.g-hero:after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.3),rgba(0,0,0,.65))}
+.g-hero>div{position:relative;z-index:1;max-width:850px}
+.g-plain{text-align:center;padding:80px 24px 48px}
+.g-t{font-size:clamp(36px,8vw,76px);line-height:1.1;margin:0 0 16px;font-weight:400;letter-spacing:-.01em}
+.g-line{width:50px;height:2px;background:var(--gac);margin:0 auto 20px}
+.g-sub{font-size:clamp(16px,2.5vw,20px);margin:0 0 32px;opacity:.9;font-style:italic;max-width:650px;margin-left:auto;margin-right:auto}
+.g-plain .g-sub{margin:0 auto;color:var(--gmu)}
+.g-btn{border:1px solid rgba(255,255,255,0.6);color:#fff;background:transparent;padding:14px 36px;letter-spacing:.15em;font-size:12px;cursor:pointer;font-family:inherit;text-transform:uppercase;border-radius:999px;transition:all .3s}
+.g-btn:hover{background:#fff;color:#111;border-color:#fff}
+.g-nav{position:sticky;top:0;z-index:30;background:var(--gbg);border-bottom:1px solid var(--gbd);display:flex;align-items:center;justify-content:space-between;padding:14px 24px;gap:12px;backdrop-filter:blur(12px)}
+.g-nav b{font-weight:500;font-size:18px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:'Playfair Display',serif}
+.g-nav>div{display:flex;gap:8px;flex:none}
+.g-ib{background:transparent;border:0;color:var(--gfg);cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:8px 14px;font-family:inherit;font-size:14px;border-radius:999px;transition:background .2s}
+.g-ib:hover{background:rgba(128,128,128,0.1)}
+.g-ib.act{color:var(--gac)}
+.g-body{padding:24px;max-width:1500px;margin:0 auto}
+.g-empty{text-align:center;color:var(--gmu);padding:80px 20px;margin:0;font-style:italic}
+.g-grid{--rh:220px;display:flex;flex-wrap:wrap;gap:12px}
+.g-grid::after{content:"";flex-grow:9999}
+.g-grid .g-i{flex:calc(var(--ar)*100) 1 calc(var(--ar)*var(--rh));min-width:0;margin:0}
+.g-mas{column-count:2;column-gap:12px}
+.g-big{max-width:900px;margin:0 auto;display:grid;gap:20px}
+@media(min-width:768px){.g-grid{--rh:280px;gap:16px}.g-mas{column-count:3;column-gap:16px}}
+@media(min-width:1200px){.g-grid{--rh:320px}.g-mas{column-count:4}}
+.g-i{position:relative;overflow:hidden;background:var(--gbd);cursor:pointer;break-inside:avoid;margin-bottom:12px;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none;aspect-ratio:var(--ar,1.5);border-radius:12px;transition:transform .3s}
+.g-big .g-i{margin:0}
+.g-i img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;-webkit-user-drag:none;opacity:0;transition:opacity .6s,transform .7s}
+.g-i img.ok{opacity:1}
+@media(hover:hover){.g-i:hover img{transform:scale(1.03)}}
+.g-h{position:absolute;right:12px;bottom:12px;width:42px;height:42px;border-radius:50%;border:0;background:rgba(0,0,0,0.45);backdrop-filter:blur(6px);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .2s,background .2s}
+.g-h:hover{transform:scale(1.1)}
+.g-h.on{color:var(--gac);background:rgba(255,255,255,0.95)}
+
+.gate{min-height:100svh;display:flex;align-items:center;justify-content:center;position:relative;padding:24px;font-family:var(--gfont),sans-serif;background:var(--gbg)}
+.gate-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(16px) brightness(.65);transform:scale(1.08);pointer-events:none}
+.gate-card{position:relative;background:var(--gbg);color:var(--gfg);width:100%;max-width:440px;padding:44px 36px;text-align:center;border-radius:24px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.3);border:1px solid var(--gbd)}
+.gate-card input{background:transparent;color:var(--gfg);border:1px solid var(--gbd);border-radius:12px;margin-bottom:14px;text-align:center;padding:14px 16px;font-family:inherit}
+.gate-card input:focus{border-color:var(--gac)}
+.g-solid{width:100%;border:0;background:var(--gac);color:#fff;padding:16px;letter-spacing:.1em;font-size:13px;text-transform:uppercase;cursor:pointer;font-family:inherit;border-radius:999px;font-weight:600;transition:opacity .2s}
+.g-solid:hover{opacity:.9}
+
+/* Lightbox con Zoom Interactivo */
+.lb{position:fixed;inset:0;background:rgba(6,6,6,0.98);z-index:60;display:flex;flex-direction:column;color:#fff;font-family:var(--gfont),sans-serif}
+.lb-top{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;background:rgba(0,0,0,0.4)}
+.lb-b{background:transparent;border:0;color:#fff;cursor:pointer;padding:8px 12px;display:inline-flex;align-items:center;border-radius:8px;transition:background .2s}
+.lb-b:hover{background:rgba(255,255,255,0.1)}
+.lb-stage{flex:1;min-height:0;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:zoom-in}
+.lb-stage.zoomed{cursor:zoom-out}
+.lb-stage img{max-width:100%;max-height:100%;object-fit:contain;pointer-events:none;-webkit-touch-callout:none;user-select:none;transition:transform .3s cubic-bezier(0.16,1,0.3,1);transform-origin:center}
+.lb-n{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.5);border:0;color:#fff;width:50px;height:50px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.lb-n:hover{background:rgba(0,0,0,0.8)}
+.lb-p{left:16px}.lb-nx{right:16px}
+.lb-bot{display:flex;gap:12px;padding:16px 24px;background:rgba(0,0,0,0.4);max-width:800px;margin:0 auto;width:100%}
+.lb-bot input{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;border-radius:999px;padding:12px 20px;flex:1}
+.lb-bot input:focus{border-color:#fff}
+.lb-s{border:0;background:#fff;color:#111;border-radius:999px;padding:0 24px;cursor:pointer;font-family:inherit;font-weight:600;transition:opacity .2s}
+.lb-s:hover{opacity:.9}
+
+@media(prefers-reduced-motion:reduce){.g-hero>img{animation:none}.g-i img{transition:none}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+const SUPABASE_URL='https://qqocorajzmobeazsbpfc.supabase.co';
+const SUPABASE_KEY='sb_publishable_skrQIOLFNMUb8H3iIYLzlw_799ZQXSB';
+
+const $=(s,r=document)=>r.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const app=$('#app');
+const configured=!SUPABASE_URL.startsWith('PEGA');
+const sb=configured?supabase.createClient(SUPABASE_URL,SUPABASE_KEY):null;
+const pub=p=>sb.storage.from('gallery').getPublicUrl(p).data.publicUrl;
+const FONTS=[["'Playfair Display', serif",'Playfair Display'],["'Cormorant Garamond', serif",'Cormorant Garamond'],["'Plus Jakarta Sans', sans-serif",'Plus Jakarta Sans'],["'Montserrat', sans-serif",'Montserrat'],['Georgia, serif','Georgia']];
+const PRESETS=[
+ ['Elegante',{font:FONTS[0][0],accent:'#b89753',layout:'mas',dark:false,cover:true}],
+ ['Moderno',{font:FONTS[2][0],accent:'#2d5a4c',layout:'grid',dark:false,cover:true}],
+ ['Nocturno',{font:FONTS[1][0],accent:'#d4af37',layout:'mas',dark:true,cover:true}],
+ ['Editorial',{font:FONTS[0][0],accent:'#8c4a32',layout:'big',dark:false,cover:true}]];
+const SLUG=new URLSearchParams(location.search).get('g');
+let timer=null;
+document.documentElement.dataset.theme=localStorage.getItem('theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+function toggleTheme(){const t=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=t;localStorage.setItem('theme',t);if(S.a)viewAlbum();else if(S.user)home()}
+function toast(m){const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(t._t);t._t=setTimeout(()=>t.style.display='none',3000)}
+
+function showModal(title, message, onConfirm){
+  const existing=$('.modal-ov');if(existing)existing.remove();
+  const ov=document.createElement('div');ov.className='modal-ov';
+  ov.innerHTML=`<div class="modal-box"><h3>${esc(title)}</h3><p>${esc(message)}</p><div class="modal-actions"><button class="btn" id="m-cancel">Cancelar</button><button class="btn pri" id="m-ok" style="background:var(--er);border-color:var(--er)">Confirmar</button></div></div>`;
+  document.body.appendChild(ov);
+  $('#m-cancel',ov).onclick=()=>ov.remove();
+  $('#m-ok',ov).onclick=()=>{ov.remove();onConfirm()};
+}
+
+const when=s=>new Date(s).toLocaleString('es',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+const ic=(d,f)=>`<svg viewBox="0 0 24 24" width="20" height="20" fill="${f||'none'}" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const HEART='<path d="M12 20s-7-4.5-9.3-9A5 5 0 0 1 12 6.5 5 5 0 0 1 21.3 11C19 15.5 12 20 12 20z"/>';
+const heart=on=>ic(HEART,on?'currentColor':'none');
+const MOON='<path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/>';
+const SUN='<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>';
+const XI='<path d="M6 6l12 12M18 6L6 18"/>';
+const STAR='<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>';
+const TRASH='<path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>';
+const LEFT='<path d="M15 5l-7 7 7 7"/>',RIGHT='<path d="M9 5l7 7-7 7"/>';
+
+/* Procesamiento de imagen y marcas de agua */
+async function decode(file){
+  try{return await createImageBitmap(file)}catch(e){}
+  const buf=new Uint8Array(await file.arrayBuffer());const starts=[];
+  for(let i=0;i<buf.length-3&&starts.length<12;i++){if(buf[i]===255&&buf[i+1]===216&&buf[i+2]===255)starts.push(i)}
+  let best=null;
+  for(const s of starts){
+    try{const bm=await createImageBitmap(new Blob([buf.subarray(s,Math.min(buf.length,s+25e6))],{type:'image/jpeg'}));
+      if(!best||bm.width*bm.height>best.width*best.height)best=bm}catch(e){}
+  }
+  if(!best)throw new Error('No se pudo leer '+file.name+'. Expórtala a JPG.');
+  return best;
+}
+function loadImg(src){return new Promise((res,rej)=>{const i=new Image();i.crossOrigin='anonymous';i.onload=()=>res(i);i.onerror=rej;i.src=src})}
+async function mark(x,W,H,w){
+  const n=w.dens,rows=n*2;let logo=null;
+  if(w.type==='png'&&w.png){try{logo=await loadImg(w.png)}catch(e){}}
+  x.save();x.translate(W/2,H/2);x.rotate(w.rot*Math.PI/180);x.globalAlpha=w.op/100;x.textAlign='center';x.textBaseline='middle';
+  const bw=2*W,bh=2*H,cw=bw/n,ch=bh/rows;
+  for(let r=0;r<rows;r++)for(let c=0;c<n;c++){
+    const cx=-bw/2+cw*(c+.5),cy=-bh/2+ch*(r+.5);
+    if(logo){const lw=W*w.size*3/100,lh=lw*logo.height/logo.width;x.drawImage(logo,cx-lw/2,cy-lh/2,lw,lh)}
+    else{x.font='500 '+(W*w.size/100)+'px sans-serif';x.shadowColor='rgba(0,0,0,.6)';x.shadowBlur=4;x.fillStyle='#fff';x.fillText(w.text||'',cx,cy)}
+  }
+  x.restore();
+}
+async function bake(file,w){
+  const bm=await decode(file);const sc=Math.min(1,1600/Math.max(bm.width,bm.height));
+  const W=Math.round(bm.width*sc),H=Math.round(bm.height*sc);
+  const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
+  x.drawImage(bm,0,0,W,H);await mark(x,W,H,w);
+  const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',.84));
+  return {blob,W,H};
+}
+
+/* Detección de orientación */
+function ratioOf(path){const m=/_(\d+)x(\d+)\.jpg$/.exec(path||'');return m?+(m[1]/m[2]).toFixed(4):null}
+const mapPhoto=p=>Object.assign({},p,{url:pub(p.path),ar:ratioOf(p.path)});
+function orient(i){
+  i.classList.add('ok');const t=i.closest('.g-i');
+  if(t&&i.naturalWidth&&i.naturalHeight){
+    const r=+(i.naturalWidth/i.naturalHeight).toFixed(4);
+    if(Math.abs(r-parseFloat(t.style.getPropertyValue('--ar')||0))>0.02)t.style.setProperty('--ar',r);
+  }
+}
+
+/* Galería y previsualización de diseño */
+const col=al=>al.dark?{bg:'#0d0d0c',fg:'#f3f1ec',mu:'#94928b',bd:'#242422'}:{bg:'#ffffff',fg:'#161514',mu:'#73716b',bd:'#e5e2d9'};
+const gvars=al=>{const k=col(al);return `--gbg:${k.bg};--gfg:${k.fg};--gmu:${k.mu};--gbd:${k.bd};--gac:${al.accent};--gfont:${al.font}`};
+function renderGallery(el,al,photos,o){
+  const pv=!o.live,list=o.onlyFav?photos.filter(p=>o.liked.has(p.id)):photos,lay=al.layout;
+  if(o.live)document.body.style.background=col(al).bg;
+  const cls=lay==='mas'?'g-mas':lay==='big'?'g-big':'g-grid';
+  const tiles=list.map(p=>{const on=o.liked.has(p.id);return `<div class="g-i" data-o="${p.id}" style="--ar:${p.ar||1.5}"><img src="${p.url}" alt="" draggable="false" loading="lazy" onload="orient(this)">${pv?'':`<button class="g-h ${on?'on':''}" data-h="${p.id}" aria-label="Favorita">${heart(on)}</button>`}</div>`}).join('');
+  const first=photos[0];
+  const head=`<h1 class="g-t">${esc(al.title)}</h1><div class="g-line"></div><p class="g-sub">${esc(al.subtitle)}</p>`;
+  const hero=al.cover&&first?`<header class="g-hero" style="--hh:${pv?'300px':'100svh'}"><img src="${first.url}" alt="" draggable="false"><div>${head}${pv?'':'<button class="g-btn" data-act="scroll">Ver colección</button>'}</div></header>`:`<header class="g-plain">${head}</header>`;
+  const nav=`<nav class="g-nav"><b>${esc(al.title)}</b><div><button class="g-ib ${o.onlyFav?'act':''}" data-act="fav">${heart(o.onlyFav)}<span>Favoritas <span data-cnt>${o.liked.size}</span></span></button><button class="g-ib" data-act="dark" aria-label="Cambiar modo">${ic(al.dark?SUN:MOON)}</button></div></nav>`;
+  const body=list.length?`<div class="g-body" id="gb"><div class="${cls}">${tiles}</div></div>`:`<div class="g-body" id="gb"><p class="g-empty">${o.onlyFav?'Aún no tienes fotos marcadas como favoritas. Toca el corazón en tus preferidas.':'Este álbum todavía no tiene fotografías publicadas.'}</p></div>`;
+  el.innerHTML=`<div class="g" style="${gvars(al)}">${hero}${nav}${body}</div>`;
+  el.querySelectorAll('.g-i img').forEach(i=>{if(i.complete&&i.naturalWidth)orient(i)});
+  el.oncontextmenu=e=>{if(o.live)e.preventDefault()};
+  el.onclick=e=>{
+    if(!o.live)return;
+    const h=e.target.closest('[data-h]');if(h){e.stopPropagation();o.toggle(h.dataset.h);return}
+    const op=e.target.closest('[data-o]');if(op){o.open(op.dataset.o);return}
+    const a=e.target.closest('[data-act]');if(!a)return;
+    if(a.dataset.act==='fav')o.fav();else if(a.dataset.act==='dark')o.dark();else $('#gb').scrollIntoView({behavior:'smooth'});
+  };
+}
+
+/* Vista del cliente (Consulta directa a Supabase por enlace / slug) */
+async function clientMode(slug){
+  const {data: album, error: errAlb}=await sb.from('albums').select('*').eq('slug', slug).single();
+  if(errAlb||!album){app.innerHTML='<div class="login" style="text-align:center"><h1>Galería no encontrada</h1><p class="mu">Este enlace ha expirado o no es válido.</p></div>';return}
+  const {data: rawPhotos}=await sb.from('photos').select('*').eq('album_id', album.id).order('position').order('created_at');
+  const photos=(rawPhotos||[]).map(mapPhoto);
+  const al=Object.assign({},album);
+
+  const ls=k=>{try{return JSON.parse(localStorage.getItem(k+slug))}catch(e){return null}};
+  let V=ls('v_'),onlyFav=false;const L=new Set(ls('l_')||[]),C=ls('c_')||{};
+  const sv=()=>{localStorage.setItem('l_'+slug,JSON.stringify([...L]));localStorage.setItem('c_'+slug,JSON.stringify(C))};
+  const d=localStorage.getItem('d_'+slug);if(d!==null)al.dark=d==='1';
+  
+  const ev=(photoId,kind,text)=>sb.from('events').insert({
+    album_id: al.id,
+    photo_id: photoId || null,
+    viewer_name: V.name,
+    viewer_email: V.email,
+    kind: kind,
+    body: text || ''
+  }).then(r=>{if(r.error)console.error(r.error)});
+
+  const paint=()=>{app.querySelectorAll('[data-h]').forEach(b=>{const on=L.has(b.dataset.h);b.classList.toggle('on',on);b.innerHTML=heart(on)});const c=app.querySelector('[data-cnt]');if(c)c.textContent=L.size};
+  const toggle=(id,inLb)=>{const on=!L.has(id);on?L.add(id):L.delete(id);sv();ev(id,on?'like':'unlike');if(onlyFav&&!on&&!inLb)show();else paint()};
+  const show=()=>renderGallery(app,al,photos,{live:true,onlyFav,liked:L,toggle:id=>toggle(id),open:lbOpen,
+    fav:()=>{onlyFav=!onlyFav;show();window.scrollTo(0,0)},
+    dark:()=>{al.dark=!al.dark;localStorage.setItem('d_'+slug,al.dark?'1':'0');show()}});
+  
+  function lbOpen(id){
+    const list=onlyFav?photos.filter(p=>L.has(p.id)):photos;let i=Math.max(0,list.findIndex(p=>p.id===id));
+    const lb=document.createElement('div');lb.className='lb';lb.setAttribute('style',gvars(al));
+    lb.innerHTML=`<div class="lb-top"><span data-c></span><div><button class="lb-b" data-l="h" aria-label="Favorita"></button><button class="lb-b" data-l="x" aria-label="Cerrar">${ic(XI)}</button></div></div><div class="lb-stage" id="lb-stage"><button class="lb-n lb-p" data-l="p" aria-label="Anterior">${ic(LEFT)}</button><img alt="" draggable="false" id="lb-img"><button class="lb-n lb-nx" data-l="n" aria-label="Siguiente">${ic(RIGHT)}</button></div><div class="lb-bot"><input placeholder="Escribe una sugerencia para esta foto" maxlength="400"><button class="lb-s" data-l="s">Enviar</button></div>`;
+    document.body.appendChild(lb);document.body.style.overflow='hidden';
+    const img=$('#lb-img',lb),stage=$('#lb-stage',lb),inp=$('input',lb);
+    let isZoomed=false;
+    
+    stage.onclick=e=>{
+      if(e.target.closest('[data-l]')||e.target.tagName==='INPUT')return;
+      isZoomed=!isZoomed;
+      if(isZoomed){
+        stage.classList.add('zoomed');
+        img.style.transform='scale(2.2)';
+        toast('Zoom activado (2.2x)');
+      }else{
+        stage.classList.remove('zoomed');
+        img.style.transform='none';
+      }
+    };
+
+    const draw=()=>{
+      isZoomed=false;stage.classList.remove('zoomed');img.style.transform='none';
+      const p=list[i];img.src=p.url;$('[data-c]',lb).textContent=(i+1)+' de '+list.length;
+      const on=L.has(p.id),h=$('[data-l=h]',lb);h.innerHTML=heart(on);h.style.color=on?al.accent:'';inp.value=C[p.id]||''
+    };
+    const go=n=>{i=(i+n+list.length)%list.length;draw()};
+    const close=()=>{lb.remove();document.body.style.overflow='';document.removeEventListener('keydown',key);onlyFav?show():paint()};
+    const key=e=>{if(e.target.tagName==='INPUT'&&e.key!=='Escape')return;if(e.key==='Escape')close();else if(e.key==='ArrowLeft')go(-1);else if(e.key==='ArrowRight')go(1)};
+    document.addEventListener('keydown',key);
+    lb.oncontextmenu=e=>e.preventDefault();
+    lb.onclick=e=>{
+      const b=e.target.closest('[data-l]');if(!b)return;const a=b.dataset.l;
+      if(a==='x')close();else if(a==='p')go(-1);else if(a==='n')go(1);
+      else if(a==='h'){toggle(list[i].id,true);draw()}
+      else if(a==='s'){const t=inp.value.trim();if(!t)return;C[list[i].id]=t;sv();ev(list[i].id,'comment',t);toast('Sugerencia enviada')}
+    };
+    let x0=null;lb.addEventListener('touchstart',e=>{x0=e.touches[0].clientX},{passive:true});
+    lb.addEventListener('touchend',e=>{if(x0===null||e.target.tagName==='INPUT'||isZoomed)return;const dx=e.changedTouches[0].clientX-x0;if(Math.abs(dx)>50)go(dx<0?1:-1);x0=null});
+    draw();
+  }
+
+  if(V){show();return}
+  const first=photos[0];document.body.style.background=col(al).bg;
+  app.innerHTML=`<div class="gate" style="${gvars(al)}">${first?`<img class="gate-bg" src="${first.url}" alt="" draggable="false">`:''}<div class="gate-card"><h1 class="g-t" style="font-size:clamp(28px,7vw,42px)">${esc(al.title)}</h1><div class="g-line"></div><p style="color:var(--gmu);margin:0 0 20px;font-size:15px">Ingresa tus datos para acceder a la colección privada.</p><input id="gn" placeholder="Tu nombre" autocomplete="name"><input id="ge" type="email" placeholder="tucorreo@ejemplo.com" autocomplete="email"><div class="err" id="gr"></div><button class="g-solid" id="go">Acceder a la Colección</button></div></div>`;
+  $('#go').onclick=()=>{
+    const name=$('#gn').value.trim(),email=$('#ge').value.trim();
+    if(!name){$('#gr').textContent='Escribe tu nombre';return}
+    if(!/^\S+@\S+\.\S+$/.test(email)){$('#gr').textContent='Escribe un correo válido';return}
+    V={name,email};localStorage.setItem('v_'+slug,JSON.stringify(V));ev(null,'enter','');show();
+  };
+}
+
+/* Modo Fotógrafo */
+const S={user:null,albums:[],a:null,photos:[],events:[],sub:'fotos',top:'albums',wm:null,dz:null,sampleOri:'hor'};
+async function adminMode(){const {data}=await sb.auth.getSession();if(data.session){S.user=data.session.user;home()}else login()}
+function login(msg){
+  app.innerHTML=`<div class="login"><h1>LumenStudio</h1><p class="mu" style="margin:0 0 24px">Administra tus colecciones y protege tus sesiones fotográficas.</p>
+  <div class="fld">Correo electrónico<input id="em" type="email" autocomplete="email"></div>
+  <div class="fld">Contraseña<input id="pw" type="password" autocomplete="current-password" placeholder="Mínimo 6 caracteres"></div>
+  <div class="err" id="er">${esc(msg||'')}</div><div class="row" style="margin-top:8px"><button class="btn pri" onclick="auth('in')">Iniciar Sesión</button><button class="btn" onclick="auth('up')">Registrarse</button></div></div>`;
+}
+async function auth(m){
+  const email=$('#em').value.trim(),password=$('#pw').value;
+  const r=m==='in'?await sb.auth.signInWithPassword({email,password}):await sb.auth.signUp({email,password});
+  if(r.error){$('#er').textContent=r.error.message;return}
+  if(!r.data.session){$('#er').textContent='Revisa tu correo para confirmar la cuenta.';return}
+  S.user=r.data.session.user;home();
+}
+async function logout(){await sb.auth.signOut();S.user=null;S.a=null;clearInterval(timer);login()}
+const topbar=()=>`<header class="top"><div class="brand">LumenStudio</div><nav><button class="${S.top==='albums'&&!S.a?'on':''}" onclick="S.top='albums';home()">Colecciones</button><button class="${S.top==='panel'?'on':''}" onclick="S.top='panel';home()">Actividad</button></nav><div class="row" style="gap:4px"><button class="ib" onclick="toggleTheme()" aria-label="Tema">${ic(document.documentElement.dataset.theme==='dark'?SUN:MOON)}</button><button class="ib" onclick="logout()" title="Cerrar sesión">Salir</button></div></header>`;
+async function home(){
+  clearInterval(timer);S.a=null;
+  const [a,p]=await Promise.all([sb.from('albums').select('*').order('created_at',{ascending:false}),sb.from('photos').select('album_id,path,position,created_at').order('position').order('created_at')]);
+  S.albums=a.data||[];const m={};(p.data||[]).forEach(x=>{(m[x.album_id]=m[x.album_id]||[]).push(x)});S.albums.forEach(x=>{x._p=m[x.id]||[]});
+  app.innerHTML=topbar()+'<main class="wrap" id="body"></main>';
+  if(S.top==='panel')return panel();
+  $('#body').innerHTML=`<div class="row" style="margin-bottom:28px;flex-wrap:nowrap"><input id="na" placeholder="Nombre de la nueva sesión o álbum" style="flex:1;min-width:0"><button class="btn pri" onclick="addAlbum()">Crear Colección</button></div>
+  ${S.albums.length?`<div class="cols">${S.albums.map(x=>`<div class="col"><div class="cv" onclick="openAlbum('${x.id}','fotos')">${x._p[0]?`<img src="${pub(x._p[0].path)}" alt="">`:'Sin fotos'}</div><div class="col-info"><div onclick="openAlbum('${x.id}','fotos')" style="cursor:pointer;flex:1"><b>${esc(x.name)}</b><span class="mu">${x._p.length} fotografías</span></div><button class="ib" style="color:var(--er)" onclick="delAlbumDirect('${x.id}')" title="Borrar colección">${ic(TRASH)}</button></div></div>`).join('')}</div>`:'<div class="card" style="text-align:center;padding:48px"><h2 style="margin-bottom:8px">Crea tu primera colección</h2><p class="mu" style="margin:0">Organiza tus sesiones fotográficas y compártelas de forma privada.</p></div>'}`;
+}
+async function addAlbum(){
+  const n=$('#na').value.trim();if(!n){$('#na').placeholder='Escribe un nombre válido';$('#na').focus();return}
+  const slug = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 6);
+  const {data,error}=await sb.from('albums').insert({name:n,title:n,slug,font:FONTS[0][0],accent:'#b89753',layout:'mas'}).select().single();
+  if(error)return toast(error.message);
+  data._p=[];S.albums.unshift(data);openAlbum(data.id,'fotos');
+}
+const link=()=>location.origin+location.pathname+'?g='+(S.a.slug||'');
+async function openAlbum(id,sub){
+  clearInterval(timer);
+  S.a=S.albums.find(x=>x.id===id)||S.a;S.sub=sub||S.sub||'fotos';
+  const [p,e]=await Promise.all([
+    sb.from('photos').select('*').eq('album_id',S.a.id).order('position').order('created_at'),
+    sb.from('events').select('*').eq('album_id',S.a.id).order('created_at',{ascending:false}).limit(500)]);
+  S.photos=(p.data||[]).map(mapPhoto);S.events=e.data||[];
+  S.a._p=S.photos;
+  S.wm=Object.assign({type:'text',text:'LumenStudio',png:null,size:6,op:40,dens:3,rot:-25},S.a.wm||{});
+  S.dz={title:S.a.title||S.a.name,subtitle:S.a.subtitle||'',font:S.a.font,accent:S.a.accent,layout:S.a.layout,dark:!!S.a.dark,cover:S.a.cover!==false};
+  viewAlbum();
+}
+function viewAlbum(){
+  const T=[['fotos','Fotos'],['sel','Selección'],['diseno','Diseño'],['marca','Marca de agua'],['ajustes','Ajustes']];
+  app.innerHTML=topbar()+`<main class="wrap"><button class="back" onclick="S.top='albums';home()">‹ Volver a Colecciones</button>
+  <div class="ah"><div><h1>${esc(S.a.name)}</h1><div class="mu">${S.photos.length} fotografías publicadas</div></div><div class="row"><a class="btn" href="${esc(link())}" target="_blank" rel="noopener">Vista de Cliente</a><button class="btn pri" onclick="copyLink()">Copiar Enlace</button><button class="btn dng" onclick="delAlbum()">Borrar</button></div></div>
+  <nav class="tabs">${T.map(t=>`<button class="${S.sub===t[0]?'on':''}" onclick="S.sub='${t[0]}';viewAlbum()">${t[1]}</button>`).join('')}</div></nav><div id="body"></div></main>`;
+  ({fotos:subFotos,sel:subSel,diseno:subDiseno,marca:subMarca,ajustes:subAjustes})[S.sub]();
+}
+function copyLink(){
+  const u=link();
+  (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(()=>toast('Enlace copiado al portapapeles')).catch(()=>{prompt('Copia este enlace:',u)});
+}
+function selMap(){
+  const m={},seen={};const get=id=>m[id]||(m[id]={likes:[],cm:[]});
+  for(const e of S.events){if(!e.photo_id)continue;const k=e.photo_id+'|'+e.viewer_email;
+    if((e.kind==='like'||e.kind==='unlike')&&!seen[k]){seen[k]=1;if(e.kind==='like')get(e.photo_id).likes.push(e.viewer_name)}}
+  for(const e of S.events)if(e.kind==='comment'&&e.photo_id)get(e.photo_id).cm.push(e);
+  return m;
+}
+
+/* Fotos */
+function subFotos(){
+  const m=selMap();
+  $('#body').innerHTML=`<label class="drop"><input type="file" multiple accept="image/*,.cr2,.cr3,.nef,.arw,.dng,.raf,.orf,.rw2" hidden onchange="upl(this.files)"><div style="font-weight:600;font-size:16px;margin-bottom:4px">Arrastra o haz clic para subir fotografías</div><div class="mu">Soporta JPG, PNG y archivos RAW. Se procesan automáticamente con protección y marca de agua.</div></label>
+  <div class="bar"><i id="pb"></i></div><div class="mu" id="st" style="margin:-8px 0 16px;min-height:18px"></div>
+  ${S.photos.length?`<div class="pg">${S.photos.map((p,i)=>`<div class="pt"><img src="${p.url}" alt="" loading="lazy"><button class="pb" style="right:44px" onclick="setCover('${p.id}')" title="Usar como portada">${ic(STAR)}</button><button class="pb" style="right:8px" onclick="delPh('${p.id}')" title="Eliminar foto">${ic(XI)}</button>${i===0?'<span class="tag">Portada</span>':p.ar?`<span class="tag">${p.ar<1?'Vertical':p.ar>1?'Horizontal':'Cuadrada'}</span>`:''}${m[p.id]&&m[p.id].likes.length?`<span class="tag" style="left:auto;right:8px">♥ ${m[p.id].likes.length}</span>`:''}</div>`).join('')}</div>`:'<p class="mu" style="text-align:center;padding:40px">Aún no hay fotos en esta colección.</p>'}`;
+}
+async function upl(files){
+  const st=$('#st'),pb=$('#pb'),N=files.length;let n=0;const base=Math.max(0,...S.photos.map(p=>p.position||0));
+  for(const f of files){
+    n++;st.textContent='Subiendo '+n+' de '+N+': '+f.name;
+    try{
+      const {blob,W,H}=await bake(f,S.wm);
+      const path=S.user.id+'/'+S.a.id+'/'+crypto.randomUUID()+'_'+W+'x'+H+'.jpg';
+      let r=await sb.storage.from('gallery').upload(path,blob,{contentType:'image/jpeg'});if(r.error)throw r.error;
+      r=await sb.from('photos').insert({album_id:S.a.id,path,name:f.name,position:base+n});if(r.error)throw r.error;
+    }catch(e){toast(e.message||'Error al subir')}
+    pb.style.width=(n/N*100)+'%';
+  }
+  toast('Fotografías subidas con éxito');openAlbum(S.a.id,'fotos');
+}
+async function setCover(id){
+  const min=Math.min(0,...S.photos.map(p=>p.position||0))-1;
+  const {error}=await sb.from('photos').update({position:min}).eq('id',id);if(error)return toast(error.message);
+  toast('Portada actualizada');openAlbum(S.a.id,'fotos');
+}
+async function delPh(id){
+  const p=S.photos.find(x=>x.id===id);
+  await sb.storage.from('gallery').remove([p.path]);await sb.from('photos').delete().eq('id',id);openAlbum(S.a.id,'fotos');
+}
+
+/* Selección */
+function subSel(){
+  const m=selMap(),ids=Object.keys(m).filter(id=>m[id].likes.length||m[id].cm.length);
+  const per={};ids.forEach(id=>m[id].likes.forEach(n=>{per[n]=(per[n]||0)+1}));
+  $('#body').innerHTML=ids.length?`<div class="chips">${Object.keys(per).map(n=>`<span class="chip">${esc(n)}: ${per[n]} favoritas</span>`).join('')}</div>`+ids.map(id=>{const p=S.photos.find(x=>x.id===id);if(!p)return '';
+    return `<div class="item"><img src="${p.url}" alt=""><div style="min-width:0;flex:1"><div style="font-weight:600">${esc(p.name)}</div>${m[id].likes.length?`<div class="mu">Favorita de ${m[id].likes.map(esc).join(', ')}</div>`:''}${m[id].cm.map(c=>`<div class="mu">${esc(c.viewer_name)} sugiere: “${esc(c.body)}”</div>`).join('')}</div></div>`}).join('')
+    :'<div class="card" style="text-align:center;padding:48px"><h2 style="margin-bottom:6px">Sin selecciones aún</h2><p class="mu" style="margin:0">Comparte el enlace con tu cliente para ver sus favoritas y sugerencias de retoque.</p></div>';
+}
+
+/* Diseño */
+function refDz(){renderGallery($('#dz'),S.dz,S.photos,{live:false,liked:new Set(),onlyFav:false})}
+function preset(i){Object.assign(S.dz,PRESETS[i][1]);subDiseno()}
+function subDiseno(){
+  const d=S.dz;const known=FONTS.some(f=>f[0]===d.font);
+  $('#body').innerHTML=`<div class="mu" style="margin-bottom:10px">Previsualización en tiempo real de la página que verá tu cliente:</div><div class="pvf"><div id="dz"></div></div>
+  <div class="chips">${PRESETS.map((p,i)=>`<button class="chip" onclick="preset(${i})">${p[0]}</button>`).join('')}</div>
+  <div class="fld">Título de la galería<input value="${esc(d.title)}" oninput="S.dz.title=this.value;refDz()"></div>
+  <div class="fld">Mensaje o dedicatoria<input value="${esc(d.subtitle)}" oninput="S.dz.subtitle=this.value;refDz()"></div>
+  <div class="fld">Tipografía<select onchange="S.dz.font=this.value;refDz()">${known?'':`<option selected value="${esc(d.font)}">Actual</option>`}${FONTS.map(f=>`<option value="${esc(f[0])}" ${d.font===f[0]?'selected':''}>${f[1]}</option>`).join('')}</select></div>
+  <div class="g2"><div class="fld">Color de acento<input type="color" value="${esc(d.accent)}" oninput="S.dz.accent=this.value;refDz()"></div>
+  <div class="fld">Distribución de grilla<select onchange="S.dz.layout=this.value;refDz()"><option value="mas" ${d.layout==='mas'?'selected':''}>Mosaico Artístico</option><option value="grid" ${d.layout==='grid'?'selected':''}>Cuadrícula Ajustada</option><option value="big" ${d.layout==='big'?'selected':''}>Columna Individual</option></select></div></div>
+  <label class="row" style="margin-bottom:10px"><input type="checkbox" ${d.dark?'checked':''} onchange="S.dz.dark=this.checked;refDz()"> Modo oscuro por defecto para el cliente</label>
+  <label class="row" style="margin-bottom:20px"><input type="checkbox" ${d.cover?'checked':''} onchange="S.dz.cover=this.checked;refDz()"> Portada inmersiva a pantalla completa</label>
+  <button class="btn pri" onclick="saveDz()">Guardar Diseño</button>`;
+  refDz();
+}
+async function saveDz(){const d=S.dz;const {error}=await sb.from('albums').update({title:d.title,subtitle:d.subtitle,font:d.font,accent:d.accent,layout:d.layout,dark:d.dark,cover:d.cover}).eq('id',S.a.id);if(error)return toast(error.message);Object.assign(S.a,d);toast('Diseño guardado exitosamente')}
+
+/* Marca de agua con previsualización automática */
+let sampleImgCache=null;
+async function drawPv(){
+  const c=$('#pv'),x=c.getContext('2d'),W=c.width,H=c.height;
+  x.clearRect(0,0,W,H);
+  
+  if(!sampleImgCache){
+    try {
+      const sampleUrl = S.sampleOri === 'hor' 
+        ? 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1000&q=80'
+        : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1000&q=80';
+      sampleImgCache = await loadImg(sampleUrl);
+    } catch(e) {
+      sampleImgCache = null;
+    }
+  }
+
+  if(sampleImgCache){
+    const bm = sampleImgCache;
+    const s = Math.max(W/bm.width, H/bm.height), w = bm.width*s, h = bm.height*s;
+    x.drawImage(bm, (W-w)/2, (H-h)/2, w, h);
+  } else {
+    x.fillStyle='#1c1b19';x.fillRect(0,0,W,H);
+  }
+  await mark(x,W,H,S.wm);
+}
+function rg(t,k,mn,mx){return `<div class="fld">${t}: <span id="v_${k}" style="color:var(--fg);font-weight:600">${S.wm[k]}</span><input type="range" min="${mn}" max="${mx}" step="1" value="${S.wm[k]}" oninput="S.wm.${k}=+this.value;$('#v_${k}').textContent=this.value;drawPv()"></div>`}
+function subMarca(){
+  const w=S.wm;
+  $('#body').innerHTML=`<div class="row" style="margin-bottom:12px;justify-content:space-between"><div class="mu">Previsualización con foto de muestra:</div><div class="chips" style="margin-bottom:0"><button class="chip ${S.sampleOri==='hor'?'on':''}" onclick="S.sampleOri='hor';sampleImgCache=null;drawPv()">Horizontal</button><button class="chip ${S.sampleOri==='vert'?'on':''}" onclick="S.sampleOri='vert';sampleImgCache=null;drawPv()">Vertical</button></div></div>
+  <canvas id="pv" width="900" height="560" style="border-radius:var(--radius);border:1px solid var(--bd);margin-bottom:18px;box-shadow:var(--shadow)"></canvas>
+  <div class="fld">Tipo de Marca<select onchange="S.wm.type=this.value;subMarca()"><option value="text" ${w.type==='text'?'selected':''}>Texto Personalizado</option><option value="png" ${w.type==='png'?'selected':''}>Logotipo PNG</option></select></div>
+  ${w.type==='text'?`<div class="fld">Texto de Marca<input value="${esc(w.text)}" oninput="S.wm.text=this.value;drawPv()"></div>`:`<div class="fld">Archivo PNG transparente<input type="file" accept="image/png" onchange="setLogo(this.files[0])"></div>`}
+  ${rg('Tamaño','size',2,15)}${rg('Opacidad','op',10,100)}${rg('Cantidad de repeticiones (Densidad)','dens',1,5)}${rg('Rotación','rot',-60,60)}
+  <button class="btn pri" onclick="saveWm()" style="margin-top:10px">Guardar Marca de Agua</button><p class="mu" style="margin-top:10px">Se aplicará automáticamente a todas las fotografías que subas a partir de ahora.</p>`;
+  drawPv();
+}
+async function setLogo(f){
+  if(!f)return;const bm=await createImageBitmap(f),s=Math.min(1,400/bm.width),c=document.createElement('canvas');
+  c.width=Math.round(bm.width*s);c.height=Math.round(bm.height*s);c.getContext('2d').drawImage(bm,0,0,c.width,c.height);
+  S.wm.png=c.toDataURL('image/png');drawPv();
+}
+async function saveWm(){const {error}=await sb.from('albums').update({wm:S.wm}).eq('id',S.a.id);if(error)return toast(error.message);S.a.wm=Object.assign({},S.wm);toast('Marca de agua guardada con éxito')}
+
+/* Ajustes y borrado */
+function subAjustes(){
+  $('#body').innerHTML=`<div class="fld">Nombre de la colección<input id="rn" value="${esc(S.a.name)}"></div><button class="btn pri" onclick="rename()">Guardar Nombre</button>
+  <div class="fld" style="margin-top:28px">Enlace exclusivo para el cliente<input value="${esc(link())}" readonly onclick="this.select()"></div>
+  <p class="mu">El cliente deberá registrar su nombre y correo al abrir el enlace para poder interactuar.</p>
+  <div style="margin-top:36px"><button class="btn dng" onclick="delAlbum()">Eliminar Colección Completa</button></div>`;
+}
+async function rename(){const n=$('#rn').value.trim();if(!n)return;const {error}=await sb.from('albums').update({name:n}).eq('id',S.a.id);if(error)return toast(error.message);S.a.name=n;toast('Nombre actualizado');viewAlbum()}
+function delAlbum(){
+  showModal('Eliminar Colección', '¿Estás seguro de eliminar esta colección y todas sus fotografías? Esta acción es irreversible.', async () => {
+    if(S.photos.length)await sb.storage.from('gallery').remove(S.photos.map(p=>p.path));
+    await sb.from('albums').delete().eq('id',S.a.id);S.top='albums';home();
+  });
+}
+function delAlbumDirect(id){
+  const alb = S.albums.find(x=>x.id===id);
+  showModal('Eliminar Colección', `¿Deseas eliminar la colección "${alb?alb.name:''}"?`, async () => {
+    const {data: phs}=await sb.from('photos').select('*').eq('album_id',id);
+    if(phs && phs.length) await sb.storage.from('gallery').remove(phs.map(p=>p.path));
+    await sb.from('albums').delete().eq('id',id);
+    home();
+  });
+}
+
+/* Actividad */
+const TXT={enter:'entró a la galería',like:'marcó una favorita',unlike:'quitó una favorita',comment:'dejó una sugerencia'};
+async function panel(){
+  const {data}=await sb.from('events').select('*, albums(name), photos(path,name)').order('created_at',{ascending:false}).limit(100);
+  const ev=data||[];const c=k=>ev.filter(e=>e.kind===k).length;
+  const M=(l,v)=>`<div class="stat"><div>${l}</div><div>${v}</div></div>`;
+  $('#body').innerHTML=`<div class="g2" style="margin-bottom:28px">${M('Visitas totales',c('enter'))}${M('Favoritas marcadas',c('like')-c('unlike'))}${M('Sugerencias de retoque',c('comment'))}${M('Eventos recientes',ev.length)}</div>
+  ${ev.map(e=>`<div class="item">${e.photos?`<img src="${pub(e.photos.path)}" alt="">`:`<div class="av">${esc((e.viewer_name||'?').trim().charAt(0).toUpperCase())}</div>`}<div style="min-width:0;flex:1"><div><b style="font-weight:600">${esc(e.viewer_name)}</b> ${TXT[e.kind]||''}${e.kind==='comment'?': “'+esc(e.body)+'”':''}</div>
+  <div class="mu" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(e.viewer_email)} en ${esc(e.albums?e.albums.name:'')}, ${when(e.created_at)}</div></div></div>`).join('')||'<div class="card" style="text-align:center;padding:48px"><h2 style="margin-bottom:6px">Sin actividad registrada</h2><p class="mu" style="margin:0">Cuando tus clientes abran sus enlaces, verás aquí sus visitas, likes y comentarios.</p></div>'}`;
+  clearInterval(timer);timer=setInterval(()=>{if(S.top==='panel'&&!S.a&&$('#body'))panel()},20000);
+}
+
+/* Arranque */
+if(!configured){
+  app.innerHTML='<div class="login"><h1>Falta configurar Supabase</h1><p class="mu">Por favor verifica tus credenciales de Supabase en el código.</p></div>';
+}else if(SLUG){clientMode(SLUG)}else{adminMode()}
+</script>
+</body>
+</html>
