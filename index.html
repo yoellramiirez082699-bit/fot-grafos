@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Galería</title>
+<style>
+:root{--bg:#faf9f5;--fg:#1f1e1d;--mu:#6b6a65;--bd:#dedbd2;--card:#fff;--ac:#D85A30}
+[data-theme=dark]{--bg:#171716;--fg:#f1efe8;--mu:#a8a69e;--bd:#3a3935;--card:#222221}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,sans-serif;font-size:16px}
+#app{max-width:720px;margin:0 auto;padding:14px}
+h2,h3{font-weight:500;margin:0 0 10px}
+button,input,select{font:inherit;color:inherit}
+button,label.btn{background:transparent;border:1px solid var(--bd);border-radius:8px;padding:8px 12px;cursor:pointer;display:inline-block}
+button.pri{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+button.dng{color:#c0392b}
+input,select{background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:9px 10px;width:100%}
+input[type=checkbox]{width:auto}
+input[type=range]{padding:0}
+input[type=color]{height:40px;padding:2px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.tabs button.on{border-color:var(--ac);color:var(--ac)}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;margin-bottom:10px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.mu{color:var(--mu);font-size:13px}
+.err{color:#c0392b;font-size:14px;min-height:20px}
+.fld{margin-bottom:10px;font-size:13px;color:var(--mu)}
+.fld>input,.fld>select{margin-top:4px;color:var(--fg);font-size:16px}
+.img{position:relative;overflow:hidden;border-radius:6px;background:#888;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none}
+.img img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;-webkit-user-drag:none}
+.shield{position:absolute;inset:0}
+.x{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.6);color:#fff;border:none;padding:2px 9px}
+.item{display:flex;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--bd)}
+.item img{width:44px;height:44px;object-fit:cover;border-radius:6px}
+.dot{width:44px;height:44px;border-radius:6px;background:var(--bd);display:flex;align-items:center;justify-content:center}
+#toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 14px;border-radius:8px;font-size:14px;display:none;z-index:9}
+canvas{width:100%;border-radius:8px;display:block}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+const SUPABASE_URL='https://qqocorajzmobeazsbpfc.supabase.co';
+const SUPABASE_KEY='sb_publishable_skrQIOLFNMUb8H3iIYLzlw_799ZQXSB';
+
+const $=(s,r=document)=>r.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const app=$('#app');
+const configured=!SUPABASE_URL.startsWith('PEGA');
+const sb=configured?supabase.createClient(SUPABASE_URL,SUPABASE_KEY):null;
+const pub=p=>sb.storage.from('gallery').getPublicUrl(p).data.publicUrl;
+const FONTS=[['Georgia, serif','Georgia'],["'Palatino Linotype', serif",'Palatino'],["'Trebuchet MS', sans-serif",'Trebuchet'],['system-ui, sans-serif','Moderna'],["'Courier New', monospace",'Máquina de escribir']];
+const SLUG=new URLSearchParams(location.search).get('g');
+let timer=null;
+document.documentElement.dataset.theme=localStorage.getItem('theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+function toggleTheme(){const t=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=t;localStorage.setItem('theme',t)}
+function toast(m){const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(t._t);t._t=setTimeout(()=>t.style.display='none',2500)}
+const when=s=>new Date(s).toLocaleString('es',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+
+/* ---------- Imagen: lectura (incluye vista previa incrustada de RAW), marca de agua y reducción ---------- */
+async function decode(file){
+  try{return await createImageBitmap(file)}catch(e){}
+  const buf=new Uint8Array(await file.arrayBuffer());const starts=[];
+  for(let i=0;i<buf.length-3&&starts.length<12;i++){if(buf[i]===255&&buf[i+1]===216&&buf[i+2]===255)starts.push(i)}
+  let best=null;
+  for(const s of starts){
+    try{const bm=await createImageBitmap(new Blob([buf.subarray(s,Math.min(buf.length,s+25e6))],{type:'image/jpeg'}));
+      if(!best||bm.width*bm.height>best.width*best.height)best=bm}catch(e){}
+  }
+  if(!best)throw new Error('No se pudo leer '+file.name+'. Expórtala a JPG.');
+  return best;
+}
+function loadImg(src){return new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=src})}
+async function mark(x,W,H,w){
+  const n=w.dens,rows=n*2;let logo=null;
+  if(w.type==='png'&&w.png){try{logo=await loadImg(w.png)}catch(e){}}
+  x.save();x.translate(W/2,H/2);x.rotate(w.rot*Math.PI/180);x.globalAlpha=w.op/100;x.textAlign='center';x.textBaseline='middle';
+  const bw=2*W,bh=2*H,cw=bw/n,ch=bh/rows;
+  for(let r=0;r<rows;r++)for(let c=0;c<n;c++){
+    const cx=-bw/2+cw*(c+.5),cy=-bh/2+ch*(r+.5);
+    if(logo){const lw=W*w.size*3/100,lh=lw*logo.height/logo.width;x.drawImage(logo,cx-lw/2,cy-lh/2,lw,lh)}
+    else{x.font='500 '+(W*w.size/100)+'px sans-serif';x.shadowColor='rgba(0,0,0,.5)';x.shadowBlur=2;x.fillStyle='#fff';x.fillText(w.text||'',cx,cy)}
+  }
+  x.restore();
+}
+async function bake(file,w){
+  const bm=await decode(file);const sc=Math.min(1,1600/Math.max(bm.width,bm.height));
+  const W=Math.round(bm.width*sc),H=Math.round(bm.height*sc);
+  const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
+  x.drawImage(bm,0,0,W,H);await mark(x,W,H,w);
+  return new Promise(r=>c.toBlob(r,'image/jpeg',.82));
+}
+
+/* ---------- Vista de galería (la usa el cliente y la previsualización de diseño) ---------- */
+const col=al=>al.dark?{bg:'#171716',fg:'#f1efe8',mu:'#a8a69e',bd:'#3a3935'}:{bg:'#faf9f5',fg:'#1f1e1d',mu:'#6b6a65',bd:'#dedbd2'};
+function renderGallery(el,al,photos,o){
+  const k=col(al),lay=al.layout,AR=[1.5,.8,1,1.5,.8,1.2];
+  if(o.live)document.body.style.background=k.bg;
+  const gs=lay==='grid'?'display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px':lay==='mas'?'column-count:2;column-gap:8px':'display:grid;grid-template-columns:minmax(0,1fr);gap:10px';
+  const ar=i=>lay==='grid'?1.1:lay==='big'?1.5:AR[i%6];
+  const ib=`background:transparent;color:${k.mu};border:1px solid ${k.bd}`;
+  const cells=photos.map((p,i)=>{
+    const liked=o.liked&&o.liked.has(p.id);
+    return `<div style="${lay==='mas'?'break-inside:avoid;margin-bottom:8px':''}"><div class="img" style="aspect-ratio:${ar(i)}"><img src="${p.url}" draggable="false" alt=""><div class="shield"></div></div>
+    <div style="display:flex;gap:6px;margin-top:4px;align-items:center"><button data-like="${p.id}" style="padding:4px 10px;background:transparent;color:${liked?al.accent:k.mu};border:1px solid ${liked?al.accent:k.bd}">${liked?'♥ Elegida':'♡'}</button>
+    ${o.live?`<input data-ci="${p.id}" value="${esc((o.comments||{})[p.id]||'')}" placeholder="Sugerencia" style="flex:1;min-width:0;padding:5px 8px;font-size:14px;background:transparent;color:${k.fg};border:1px solid ${k.bd}"><button data-cs="${p.id}" style="padding:4px 10px;${ib}">Enviar</button>`:''}</div></div>`}).join('');
+  el.innerHTML=`<div style="background:${k.bg};color:${k.fg};font-family:${al.font};border-radius:12px;padding:14px;border:1px solid ${k.bd}">
+  ${al.cover&&photos[0]?`<div class="img" style="aspect-ratio:1.9;margin-bottom:12px"><img src="${photos[0].url}" draggable="false" alt=""><div class="shield"></div></div>`:''}
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div><div style="font-size:22px">${esc(al.title)}</div><div style="width:36px;height:3px;background:${al.accent};margin:6px 0"></div></div>
+  <button data-dark="1" style="${ib};padding:4px 10px">${al.dark?'Claro':'Oscuro'}</button></div>
+  <p style="margin:0 0 12px;font-size:14px;color:${k.mu}">Hola, ${esc(o.name)}. ${esc(al.subtitle)}</p>
+  ${photos.length?`<div style="${gs}">${cells}</div>`:`<p style="font-size:14px;color:${k.mu}">Este álbum aún no tiene fotos.</p>`}</div>`;
+  el.oncontextmenu=e=>{if(o.live)e.preventDefault()};
+  el.onclick=e=>{
+    if(!o.live)return;
+    const t=e.target.closest('[data-like],[data-cs],[data-dark]');if(!t)return;
+    if(t.dataset.like)o.like(t.dataset.like);
+    else if(t.dataset.cs){const inp=el.querySelector('[data-ci="'+t.dataset.cs+'"]');o.cmt(t.dataset.cs,inp.value.trim())}
+    else o.dark();
+  };
+}
+
+/* ---------- Modo cliente (enlace ?g=...) ---------- */
+async function clientMode(slug){
+  const {data,error}=await sb.rpc('get_gallery',{p_slug:slug});
+  if(error||!data){app.innerHTML='<p style="padding:20px">Esta galería no existe o el enlace cambió.</p>';return}
+  const al=Object.assign({},data.album),photos=(data.photos||[]).map(p=>Object.assign({},p,{url:pub(p.path)}));
+  const ls=k=>{try{return JSON.parse(localStorage.getItem(k+slug))}catch(e){return null}};
+  let V=ls('v_');const L=new Set(ls('l_')||[]);const C=ls('c_')||{};
+  const sv=()=>{localStorage.setItem('l_'+slug,JSON.stringify([...L]));localStorage.setItem('c_'+slug,JSON.stringify(C))};
+  const d=localStorage.getItem('d_'+slug);if(d!==null)al.dark=d==='1';
+  const ev=(photo,kind,text)=>sb.rpc('add_event',{p_slug:slug,p_photo:photo,p_name:V.name,p_email:V.email,p_kind:kind,p_text:text||''}).then(r=>{if(r.error)toast('No se pudo enviar. Intenta de nuevo.')});
+  const show=()=>renderGallery(app,al,photos,{live:true,name:V.name,liked:L,comments:C,
+    like:id=>{const on=!L.has(id);on?L.add(id):L.delete(id);sv();show();ev(id,on?'like':'unlike')},
+    cmt:(id,t)=>{if(!t)return;C[id]=t;sv();toast('Sugerencia enviada');ev(id,'comment',t)},
+    dark:()=>{al.dark=!al.dark;localStorage.setItem('d_'+slug,al.dark?'1':'0');show()}});
+  if(V){show();return}
+  const k=col(al);document.body.style.background=k.bg;
+  const f=`width:100%;margin-bottom:8px;background:transparent;color:${k.fg};border:1px solid ${k.bd}`;
+  app.innerHTML=`<div style="background:${k.bg};color:${k.fg};font-family:${al.font};padding:10px"><div style="font-size:24px;margin-bottom:4px">${esc(al.title)}</div><div style="width:36px;height:3px;background:${al.accent};margin:6px 0 12px"></div>
+  <p style="font-size:14px;color:${k.mu};margin:0 0 12px">Para ver las fotos, ingresa tus datos.</p>
+  <input id="gn" placeholder="Tu nombre" style="${f}"><input id="ge" type="email" placeholder="tucorreo@ejemplo.com" style="${f}">
+  <div class="err" id="gr"></div><button id="go" style="width:100%;background:${al.accent};color:#fff;border:none">Ver galería</button></div>`;
+  $('#go').onclick=async()=>{
+    const name=$('#gn').value.trim(),email=$('#ge').value.trim();
+    if(!name){$('#gr').textContent='Escribe tu nombre';return}
+    if(!/^\S+@\S+\.\S+$/.test(email)){$('#gr').textContent='Escribe un correo válido';return}
+    V={name,email};localStorage.setItem('v_'+slug,JSON.stringify(V));ev(null,'enter','');show();
+  };
+}
+
+/* ---------- Modo fotógrafo ---------- */
+const S={user:null,albums:[],a:null,photos:[],events:[],sub:'fotos',top:'albums',sample:null,wm:null,dz:null};
+async function adminMode(){const {data}=await sb.auth.getSession();if(data.session){S.user=data.session.user;home()}else login()}
+function login(msg){
+  app.innerHTML=`<h2>Galería para fotógrafos</h2><div class="card"><div class="fld">Correo<input id="em" type="email" autocomplete="email"></div>
+  <div class="fld">Contraseña (mínimo 6 caracteres)<input id="pw" type="password" autocomplete="current-password"></div>
+  <div class="err" id="er">${esc(msg||'')}</div><div class="row"><button class="pri" onclick="auth('in')">Entrar</button><button onclick="auth('up')">Crear cuenta</button></div></div>`;
+}
+async function auth(m){
+  const email=$('#em').value.trim(),password=$('#pw').value;
+  const r=m==='in'?await sb.auth.signInWithPassword({email,password}):await sb.auth.signUp({email,password});
+  if(r.error){$('#er').textContent=r.error.message;return}
+  if(!r.data.session){$('#er').textContent='Revisa tu correo para confirmar la cuenta y luego entra.';return}
+  S.user=r.data.session.user;home();
+}
+async function logout(){await sb.auth.signOut();S.user=null;clearInterval(timer);login()}
+const bar=()=>`<div class="row" style="justify-content:space-between;margin-bottom:6px"><h2 style="margin:0">Galería</h2><div class="row"><button onclick="toggleTheme()">Tema</button><button onclick="logout()">Salir</button></div></div>`;
+async function home(){
+  clearInterval(timer);S.a=null;
+  const {data}=await sb.from('albums').select('*, photos(count)').order('created_at',{ascending:false});S.albums=data||[];
+  app.innerHTML=bar()+`<div class="tabs"><button class="${S.top==='albums'?'on':''}" onclick="S.top='albums';home()">Álbumes</button><button class="${S.top==='panel'?'on':''}" onclick="S.top='panel';home()">Panel</button></div><div id="body"></div>`;
+  if(S.top==='panel')return panel();
+  $('#body').innerHTML=`<div class="row" style="margin-bottom:12px"><input id="na" placeholder="Nombre del álbum" style="flex:1;min-width:0"><button class="pri" onclick="addAlbum()">Crear</button></div>
+  ${S.albums.map(a=>`<div class="card" style="cursor:pointer" onclick="openAlbum('${a.id}')"><div>${esc(a.name)}</div><div class="mu">${a.photos&&a.photos[0]?a.photos[0].count:0} fotos</div></div>`).join('')||'<p class="mu">Crea tu primer álbum para empezar.</p>'}`;
+}
+async function addAlbum(){
+  const n=$('#na').value.trim();if(!n){$('#na').placeholder='Escribe un nombre';return}
+  const {data,error}=await sb.from('albums').insert({name:n,title:n}).select().single();
+  if(error)return toast(error.message);
+  S.albums.unshift(data);openAlbum(data.id);
+}
+async function openAlbum(id,sub){
+  clearInterval(timer);
+  S.a=S.albums.find(x=>x.id===id)||S.a;S.sub=sub||S.sub||'fotos';
+  const [p,e]=await Promise.all([
+    sb.from('photos').select('*').eq('album_id',S.a.id).order('position').order('created_at'),
+    sb.from('events').select('*').eq('album_id',S.a.id).order('created_at',{ascending:false}).limit(500)]);
+  S.photos=(p.data||[]).map(x=>Object.assign({},x,{url:pub(x.path)}));S.events=e.data||[];
+  S.wm=Object.assign({type:'text',text:'Mi estudio',png:null,size:7,op:45,dens:3,rot:-25},S.a.wm||{});
+  S.dz={title:S.a.title||S.a.name,subtitle:S.a.subtitle||'',font:S.a.font,accent:S.a.accent,layout:S.a.layout,dark:!!S.a.dark,cover:S.a.cover!==false};
+  viewAlbum();
+}
+function viewAlbum(){
+  const T=[['fotos','Fotos'],['marca','Marca de agua'],['diseno','Diseño'],['sel','Selección'],['link','Enlace']];
+  app.innerHTML=bar()+`<div class="row"><button onclick="S.top='albums';home()">‹ Álbumes</button><b>${esc(S.a.name)}</b></div>
+  <div class="tabs">${T.map(t=>`<button class="${S.sub===t[0]?'on':''}" onclick="S.sub='${t[0]}';viewAlbum()">${t[1]}</button>`).join('')}</div><div id="body"></div>`;
+  ({fotos:subFotos,marca:subMarca,diseno:subDiseno,sel:subSel,link:subLink})[S.sub]();
+}
+function selMap(){
+  const m={},seen={};
+  const get=id=>m[id]||(m[id]={likes:[],cm:[]});
+  for(const e of S.events){if(!e.photo_id)continue;const k=e.photo_id+'|'+e.viewer_email;
+    if((e.kind==='like'||e.kind==='unlike')&&!seen[k]){seen[k]=1;if(e.kind==='like')get(e.photo_id).likes.push(e.viewer_name)}}
+  for(const e of S.events)if(e.kind==='comment'&&e.photo_id)get(e.photo_id).cm.push(e);
+  return m;
+}
+function subFotos(){
+  const m=selMap();
+  $('#body').innerHTML=`<div class="row" style="margin-bottom:8px"><label class="btn">Subir fotos<input type="file" multiple accept="image/*,.cr2,.cr3,.nef,.arw,.dng,.raf,.orf,.rw2" hidden onchange="upl(this.files)"></label><button class="dng" onclick="delAlbum()">Borrar álbum</button></div>
+  <div class="mu" id="st">Las fotos se reducen a 1600 px y se les pone la marca de agua al subirlas. El archivo original no se guarda en el servidor.</div>
+  <div class="grid" style="margin-top:10px">${S.photos.map(p=>`<div><div class="img" style="aspect-ratio:1.3"><img src="${p.url}" alt=""><button class="x" onclick="delPh('${p.id}')" aria-label="Borrar">✕</button></div>
+  <div class="mu" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.name)}${m[p.id]&&m[p.id].likes.length?' · ♥ '+m[p.id].likes.length:''}</div></div>`).join('')}</div>`;
+}
+async function upl(files){
+  const st=$('#st');let n=0;const base=S.photos.length;
+  for(const f of files){
+    n++;st.textContent='Subiendo '+n+' de '+files.length+': '+f.name+'…';
+    try{
+      const blob=await bake(f,S.wm);
+      const path=S.user.id+'/'+S.a.id+'/'+crypto.randomUUID()+'.jpg';
+      let r=await sb.storage.from('gallery').upload(path,blob,{contentType:'image/jpeg'});if(r.error)throw r.error;
+      r=await sb.from('photos').insert({album_id:S.a.id,path,name:f.name,position:base+n});if(r.error)throw r.error;
+    }catch(e){toast(e.message||'Error al subir');}
+  }
+  openAlbum(S.a.id,'fotos');
+}
+async function delPh(id){
+  const p=S.photos.find(x=>x.id===id);
+  await sb.storage.from('gallery').remove([p.path]);await sb.from('photos').delete().eq('id',id);openAlbum(S.a.id,'fotos');
+}
+async function delAlbum(){
+  if(!confirm('¿Borrar el álbum y todas sus fotos?'))return;
+  if(S.photos.length)await sb.storage.from('gallery').remove(S.photos.map(p=>p.path));
+  await sb.from('albums').delete().eq('id',S.a.id);S.top='albums';home();
+}
+/* Marca de agua */
+function cover(x,bm,W,H){const s=Math.max(W/bm.width,H/bm.height),w=bm.width*s,h=bm.height*s;x.drawImage(bm,(W-w)/2,(H-h)/2,w,h)}
+async function drawPv(){
+  const c=$('#pv'),x=c.getContext('2d'),W=c.width,H=c.height;
+  if(S.sample)cover(x,S.sample,W,H);
+  else{x.fillStyle='#9fb6c8';x.fillRect(0,0,W,H);x.fillStyle='#4b5d4a';x.beginPath();x.moveTo(0,H);x.lineTo(0,H*.65);x.quadraticCurveTo(W*.4,H*.3,W*.7,H*.65);x.lineTo(W,H*.6);x.lineTo(W,H);x.fill()}
+  await mark(x,W,H,S.wm);
+}
+function rg(t,k,mn,mx){return `<div class="fld">${t}: <span id="v_${k}" style="color:var(--fg)">${S.wm[k]}</span><input type="range" min="${mn}" max="${mx}" step="1" value="${S.wm[k]}" oninput="S.wm.${k}=+this.value;$('#v_${k}').textContent=this.value;drawPv()"></div>`}
+function subMarca(){
+  const w=S.wm;
+  $('#body').innerHTML=`<canvas id="pv" width="640" height="427"></canvas><div class="row" style="margin:8px 0"><label class="btn">Usar mi foto de muestra<input type="file" accept="image/*,.cr2,.cr3,.nef,.arw,.dng" hidden onchange="setSample(this.files[0])"></label></div>
+  <div class="fld">Tipo<select onchange="S.wm.type=this.value;subMarca()"><option value="text" ${w.type==='text'?'selected':''}>Texto</option><option value="png" ${w.type==='png'?'selected':''}>Logo PNG</option></select></div>
+  ${w.type==='text'?`<div class="fld">Texto<input value="${esc(w.text)}" oninput="S.wm.text=this.value;drawPv()"></div>`:`<div class="fld">Logo PNG<input type="file" accept="image/png" onchange="setLogo(this.files[0])"></div>`}
+  ${rg('Tamaño','size',2,20)}${rg('Opacidad','op',10,100)}${rg('Cantidad (repeticiones)','dens',1,6)}${rg('Rotación','rot',-60,60)}
+  <button class="pri" onclick="saveWm()">Guardar marca de agua</button><p class="mu">Se aplica a las fotos que subas después de guardar. Las que ya están subidas no cambian.</p>`;
+  drawPv();
+}
+async function setSample(f){if(!f)return;try{S.sample=await decode(f);drawPv()}catch(e){toast(e.message)}}
+async function setLogo(f){
+  if(!f)return;const bm=await createImageBitmap(f),s=Math.min(1,400/bm.width),c=document.createElement('canvas');
+  c.width=Math.round(bm.width*s);c.height=Math.round(bm.height*s);c.getContext('2d').drawImage(bm,0,0,c.width,c.height);
+  S.wm.png=c.toDataURL('image/png');drawPv();
+}
+async function saveWm(){const {error}=await sb.from('albums').update({wm:S.wm}).eq('id',S.a.id);if(error)return toast(error.message);S.a.wm=Object.assign({},S.wm);toast('Marca de agua guardada')}
+/* Diseño */
+function refDz(){renderGallery($('#dz'),S.dz,S.photos,{live:false,name:'Cliente'})}
+function subDiseno(){
+  const d=S.dz;
+  $('#body').innerHTML=`<div class="mu" style="margin-bottom:6px">Así verá tu cliente la página:</div><div id="dz" style="margin-bottom:14px"></div>
+  <div class="fld">Título<input value="${esc(d.title)}" oninput="S.dz.title=this.value;refDz()"></div>
+  <div class="fld">Referencia o mensaje<input value="${esc(d.subtitle)}" oninput="S.dz.subtitle=this.value;refDz()"></div>
+  <div class="fld">Fuente<select onchange="S.dz.font=this.value;refDz()">${FONTS.map(f=>`<option value="${esc(f[0])}" ${d.font===f[0]?'selected':''}>${f[1]}</option>`).join('')}</select></div>
+  <div class="grid"><div class="fld">Color de acento<input type="color" value="${d.accent}" oninput="S.dz.accent=this.value;refDz()"></div>
+  <div class="fld">Distribución<select onchange="S.dz.layout=this.value;refDz()"><option value="grid" ${d.layout==='grid'?'selected':''}>Cuadrícula</option><option value="mas" ${d.layout==='mas'?'selected':''}>Mosaico</option><option value="big" ${d.layout==='big'?'selected':''}>Una columna</option></select></div></div>
+  <label class="row" style="margin-bottom:6px"><input type="checkbox" ${d.dark?'checked':''} onchange="S.dz.dark=this.checked;refDz()"> Modo oscuro por defecto</label>
+  <label class="row" style="margin-bottom:12px"><input type="checkbox" ${d.cover?'checked':''} onchange="S.dz.cover=this.checked;refDz()"> Mostrar portada</label>
+  <button class="pri" onclick="saveDz()">Guardar diseño</button>`;
+  refDz();
+}
+async function saveDz(){const d=S.dz;const {error}=await sb.from('albums').update({title:d.title,subtitle:d.subtitle,font:d.font,accent:d.accent,layout:d.layout,dark:d.dark,cover:d.cover}).eq('id',S.a.id);if(error)return toast(error.message);Object.assign(S.a,d);toast('Diseño guardado')}
+/* Selección y enlace */
+function subSel(){
+  const m=selMap(),ids=Object.keys(m).filter(id=>m[id].likes.length||m[id].cm.length);
+  $('#body').innerHTML=ids.length?ids.map(id=>{const p=S.photos.find(x=>x.id===id);if(!p)return '';
+    return `<div class="item"><img src="${p.url}" alt=""><div style="min-width:0;flex:1"><div style="font-size:14px">${esc(p.name)}</div>${m[id].likes.length?`<div class="mu">♥ ${m[id].likes.map(esc).join(', ')}</div>`:''}${m[id].cm.map(c=>`<div class="mu">${esc(c.viewer_name)}: “${esc(c.body)}”</div>`).join('')}</div></div>`}).join('')
+    :'<p class="mu">Aún no hay fotos elegidas. Comparte el enlace con tu cliente.</p>';
+}
+function subLink(){
+  const url=location.origin+location.pathname+'?g='+S.a.slug;
+  $('#body').innerHTML=`<div class="fld">Enlace para tu cliente<input id="lk" value="${esc(url)}" readonly onclick="this.select()"></div><button class="pri" onclick="copyLink()">Copiar enlace</button>
+  <p class="mu">El cliente debe poner su nombre y correo para ver las fotos. Verás lo que elija en el Panel y en la pestaña Selección.</p>`;
+}
+function copyLink(){const i=$('#lk');i.select();(navigator.clipboard?navigator.clipboard.writeText(i.value):Promise.reject()).then(()=>toast('Enlace copiado')).catch(()=>{document.execCommand('copy');toast('Enlace copiado')})}
+/* Panel */
+const TXT={enter:'entró a la galería',like:'marcó me gusta',unlike:'quitó su me gusta',comment:'dejó una sugerencia'};
+async function panel(){
+  const {data}=await sb.from('events').select('*, albums(name), photos(path,name)').order('created_at',{ascending:false}).limit(100);
+  const ev=data||[];const c=k=>ev.filter(e=>e.kind===k).length;
+  const M=(l,v)=>`<div class="card" style="margin:0"><div class="mu">${l}</div><div style="font-size:24px">${v}</div></div>`;
+  $('#body').innerHTML=`<div class="grid" style="margin-bottom:12px">${M('Entradas',c('enter'))}${M('Me gusta',c('like'))}${M('Sugerencias',c('comment'))}${M('Eventos recientes',ev.length)}</div>
+  <div class="mu" style="margin-bottom:4px">Se actualiza solo cada 20 segundos.</div>
+  ${ev.map(e=>`<div class="item">${e.photos?`<img src="${pub(e.photos.path)}" alt="">`:'<div class="dot">●</div>'}<div style="min-width:0;flex:1"><div style="font-size:14px"><b style="font-weight:500">${esc(e.viewer_name)}</b> ${TXT[e.kind]||''}${e.kind==='comment'?': “'+esc(e.body)+'”':''}</div>
+  <div class="mu" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(e.viewer_email)} · ${esc(e.albums?e.albums.name:'')} · ${when(e.created_at)}</div></div></div>`).join('')||'<p class="mu">Aún no hay actividad.</p>'}`;
+  clearInterval(timer);timer=setInterval(()=>{if(S.top==='panel'&&!S.a&&$('#body'))panel()},20000);
+}
+
+/* ---------- Arranque ---------- */
+if(!configured){
+  app.innerHTML='<h2>Falta configurar</h2><p>Abre este archivo y reemplaza SUPABASE_URL y SUPABASE_KEY (al inicio del script) con los datos de tu proyecto de Supabase.</p>';
+}else if(SLUG){clientMode(SLUG)}else{adminMode()}
+</script>
+</body>
+</html>
