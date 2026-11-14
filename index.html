@@ -298,12 +298,12 @@ async function auth(m){
   S.user=r.data.session.user;home();
 }
 async function logout(){await sb.auth.signOut();S.user=null;S.a=null;clearInterval(timer);login()}
-const top=()=>`<header class="top"><div class="brand">Galería</div><nav><button class="${S.top==='albums'&&!S.a?'on':''}" onclick="S.top='albums';home()">Colecciones</button><button class="${S.top==='panel'?'on':''}" onclick="S.top='panel';home()">Actividad</button></nav><div class="row" style="gap:0"><button class="ib" onclick="toggleTheme()" aria-label="Cambiar tema">${ic(document.documentElement.dataset.theme==='dark'?SUN:MOON)}</button><button class="ib" onclick="logout()">Salir</button></div></header>`;
+const topbar=()=>`<header class="top"><div class="brand">Galería</div><nav><button class="${S.top==='albums'&&!S.a?'on':''}" onclick="S.top='albums';home()">Colecciones</button><button class="${S.top==='panel'?'on':''}" onclick="S.top='panel';home()">Actividad</button></nav><div class="row" style="gap:0"><button class="ib" onclick="toggleTheme()" aria-label="Cambiar tema">${ic(document.documentElement.dataset.theme==='dark'?SUN:MOON)}</button><button class="ib" onclick="logout()">Salir</button></div></header>`;
 async function home(){
   clearInterval(timer);S.a=null;
   const [a,p]=await Promise.all([sb.from('albums').select('*').order('created_at',{ascending:false}),sb.from('photos').select('album_id,path,position,created_at').order('position').order('created_at')]);
   S.albums=a.data||[];const m={};(p.data||[]).forEach(x=>{(m[x.album_id]=m[x.album_id]||[]).push(x)});S.albums.forEach(x=>{x._p=m[x.id]||[]});
-  app.innerHTML=top()+'<main class="wrap" id="body"></main>';
+  app.innerHTML=topbar()+'<main class="wrap" id="body"></main>';
   if(S.top==='panel')return panel();
   $('#body').innerHTML=`<div class="row" style="margin-bottom:22px;flex-wrap:nowrap"><input id="na" placeholder="Nombre de la nueva colección" style="flex:1;min-width:0"><button class="btn pri" onclick="addAlbum()">Crear</button></div>
   ${S.albums.length?`<div class="cols">${S.albums.map(x=>`<div class="col" onclick="openAlbum('${x.id}','fotos')"><div class="cv">${x._p[0]?`<img src="${pub(x._p[0].path)}" alt="">`:'Sin fotos'}</div><b>${esc(x.name)}</b><span class="mu">${x._p.length} fotos</span></div>`).join('')}</div>`:'<div class="card" style="text-align:center"><h2 style="margin-bottom:6px">Crea tu primera colección</h2><p class="mu" style="margin:0">Una colección es una sesión de fotos que compartes con un cliente. Escribe un nombre arriba para empezar.</p></div>'}`;
@@ -329,7 +329,7 @@ async function openAlbum(id,sub){
 }
 function viewAlbum(){
   const T=[['fotos','Fotos'],['sel','Selección'],['diseno','Diseño'],['marca','Marca de agua'],['ajustes','Ajustes']];
-  app.innerHTML=top()+`<main class="wrap"><button class="back" onclick="S.top='albums';home()">‹ Colecciones</button>
+  app.innerHTML=topbar()+`<main class="wrap"><button class="back" onclick="S.top='albums';home()">‹ Colecciones</button>
   <div class="ah"><div><h1>${esc(S.a.name)}</h1><div class="mu">${S.photos.length} fotos</div></div><div class="row"><a class="btn" href="${esc(link())}" target="_blank" rel="noopener">Ver como cliente</a><button class="btn pri" onclick="copyLink()">Copiar enlace</button></div></div>
   <nav class="tabs">${T.map(t=>`<button class="${S.sub===t[0]?'on':''}" onclick="S.sub='${t[0]}';viewAlbum()">${t[1]}</button>`).join('')}</nav><div id="body"></div></main>`;
   ({fotos:subFotos,sel:subSel,diseno:subDiseno,marca:subMarca,ajustes:subAjustes})[S.sub]();
